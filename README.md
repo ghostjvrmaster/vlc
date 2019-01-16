@@ -1,4 +1,4 @@
-#VLC
+# VLC
 
 This is a customized version of VLC to support the processing of miscellaneous elementary streams.
 
@@ -16,7 +16,7 @@ Original source: [git://git.videolan.org/vlc.git]()
 
 Based on the `4.0.0-dev` tag.
 
-##Building
+## Building
 
 ```bash
 mkdir build
@@ -25,7 +25,7 @@ cmake .. -DCMAKE_INSTALL_PREFIX=`pwd`/prefix
 cmake --build .
 ```
 
-##Running
+## Running
 
 ```bash
 cd prefix
