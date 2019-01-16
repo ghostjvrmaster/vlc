@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(audio_output_adummy_plugin)
+
+include(${vlc_MODULE_HELPER})
+
+file(GLOB SRC_FILES
+        "../adummy.c")
+
+ConfigureModule(audio_output adummy)

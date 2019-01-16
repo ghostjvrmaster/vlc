@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.10)
+
+project(stream_filter_cache_read_plugin)
+
+include(${vlc_MODULE_HELPER})
+
+file(GLOB SRC_FILES
+        "../cache_read.c")
+
+ConfigureModule(stream_filter cache_read)
