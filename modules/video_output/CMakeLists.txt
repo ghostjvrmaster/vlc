@@ -5,13 +5,17 @@ project(video_output)
 include(${vlc_MODULE_HELPER})
 
 set(PLUGINS
-        vdummy;
-        vmem;
-        xcb_window;
-        xcb_x11;
-        xcb_xv;)
+        vdummy
+        vmem)
 
 set(SUBMODULES
-        opengl;)
+        opengl)
+
+if (HAVE_XCB)
+    list(APPEND PLUGINS
+            xcb_window
+            xcb_x11
+            xcb_xv)
+endif ()
 
 ConfigureModuleGroup()

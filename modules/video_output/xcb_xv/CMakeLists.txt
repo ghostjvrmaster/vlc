@@ -2,13 +2,17 @@ cmake_minimum_required(VERSION 3.10)
 
 project(video_output_xcb_xv_plugin)
 
-include(${vlc_MODULE_HELPER})
+if (HAVE_XCB)
 
-file(GLOB SRC_FILES
-        "../xcb/pictures"
-        "../xcb/xvideo.c")
+    include(${vlc_MODULE_HELPER})
 
-set(MODULE_LIBRARIES
-        X11)
+    file(GLOB SRC_FILES
+            "../xcb/pictures"
+            "../xcb/xvideo.c")
 
-ConfigureModule(video_output xcb_xv)
+    set(MODULE_LIBRARIES
+            X11)
+
+    ConfigureModule(video_output xcb_xv)
+
+endif ()

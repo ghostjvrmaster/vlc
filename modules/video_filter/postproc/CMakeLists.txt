@@ -7,4 +7,7 @@ include(${vlc_MODULE_HELPER})
 file(GLOB SRC_FILES
         "../postproc.c")
 
+set(MODULE_LIBRARIES
+        postproc)
+
 ConfigureModule(video_filter postproc)

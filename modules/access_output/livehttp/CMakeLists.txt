@@ -2,9 +2,17 @@ cmake_minimum_required(VERSION 3.10)
 
 project(access_output_livehttp_plugin)
 
-include(${vlc_MODULE_HELPER})
+if (HAVE_GCRYPT)
 
-file(GLOB SRC_FILES
-        "../livehttp.c")
+    include(${vlc_MODULE_HELPER})
 
-ConfigureModule(access_output livehttp)
+    file(GLOB SRC_FILES
+            "../livehttp.c")
+
+    set(MODULE_LIBRARIES
+            gcrypt
+            gpg-error)
+
+    ConfigureModule(access_output livehttp)
+
+endif ()

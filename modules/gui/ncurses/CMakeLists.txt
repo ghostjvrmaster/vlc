@@ -2,11 +2,15 @@ cmake_minimum_required(VERSION 3.10)
 
 project(gui_ncurses_plugin)
 
-include(${vlc_MODULE_HELPER})
+if (HAVE_NCURSES)
 
-set(SRC_FILES ../ncurses.c)
+    include(${vlc_MODULE_HELPER})
 
-set(MODULE_LIBRARIES
-        -lcurses)
+    set(SRC_FILES ../ncurses.c)
 
-ConfigureModule(gui ncurses)
+    set(MODULE_LIBRARIES
+            ${curses_LIBRARIES})
+
+    ConfigureModule(gui ncurses)
+
+endif ()

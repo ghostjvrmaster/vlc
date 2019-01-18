@@ -2,15 +2,19 @@ cmake_minimum_required(VERSION 3.10)
 
 project(video_output_xcb_window_plugin)
 
-include(${vlc_MODULE_HELPER})
+if (HAVE_XCB)
 
-file(GLOB SRC_FILES
-        "../xcb/keys.c"
-        "../xcb/window.c")
+    include(${vlc_MODULE_HELPER})
 
-set(MODULE_LIBRARIES
-        X11
-        xcb
-        xcb-shm)
+    file(GLOB SRC_FILES
+            "../xcb/keys.c"
+            "../xcb/window.c")
 
-ConfigureModule(video_output xcb_window)
+    set(MODULE_LIBRARIES
+            X11
+            xcb
+            xcb-shm)
+
+    ConfigureModule(video_output xcb_window)
+
+endif ()

@@ -8,8 +8,15 @@ include_directories(
         ${vlc_CONFIG_H_DIR})
 
 set(SRC_FILES
-        override.c
-        vlc.c)
+        override.c)
+
+if (WINDOWS)
+    list(APPEND SRC_FILES
+            winvlc.c)
+else ()
+    list(APPEND SRC_FILES
+            vlc.c)
+endif ()
 
 add_executable(vlc
         ${SRC_FILES})
@@ -22,11 +29,19 @@ add_dependencies(vlc
 target_link_libraries(vlc
         vlclib)
 
-set(ROOTWRAP_SRC_FILES
-        rootwrap.c)
+if (WINDOWS)
+    target_link_libraries(vlc
+            kernel32
+            psapi)
+endif ()
 
-add_executable(vlc-wrapper
-        ${ROOTWRAP_SRC_FILES})
+if (HAVE_SYS_SOCKET_H)
+    set(ROOTWRAP_SRC_FILES
+            rootwrap.c)
+
+    add_executable(vlc-wrapper
+            ${ROOTWRAP_SRC_FILES})
+endif ()
 
 set(CACHEGEN_SRC_FILES
         cachegen.c)
@@ -46,6 +61,5 @@ add_executable(vlc-simple
 target_link_libraries(vlc-simple
         vlclib)
 
-install(TARGETS vlc vlc-wrapper vlc-cache-gen vlc-simple
-        RUNTIME
-        DESTINATION ${BINDIR})
+install(TARGETS vlc vlc-cache-gen vlc-simple
+        RUNTIME DESTINATION ${BINDIR})

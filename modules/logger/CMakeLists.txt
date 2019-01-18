@@ -5,14 +5,16 @@ project(logger)
 include(${vlc_MODULE_HELPER})
 
 set(PLUGINS
-        console;
-        file;
-        journal;
-        syslog;)
+        console
+        file)
 
 if (ANDROID)
-    list(APPEND PLUGINS
-            android)
+    list(APPEND PLUGINS android)
+endif ()
+
+if (HAVE_SYSLOG_H)
+    list(APPEND PLUGINS syslog)
+    list(APPEND PLUGINS journal)
 endif ()
 
 ConfigureModuleGroup()

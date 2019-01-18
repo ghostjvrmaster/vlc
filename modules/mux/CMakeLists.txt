@@ -4,4 +4,7 @@ project(mux)
 
 include(${vlc_MODULE_HELPER})
 
+set(SUBMODULES
+        mp4)
+
 ConfigureModuleGroup()

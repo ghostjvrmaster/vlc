@@ -2,8 +2,13 @@ cmake_minimum_required(VERSION 3.10)
 
 project(logger_syslog_plugin)
 
-include(${vlc_MODULE_HELPER})
+if (HAVE_SYSLOG_H)
 
-set(SRC_FILES ../syslog.c)
+    include(${vlc_MODULE_HELPER})
 
-ConfigureModule(logger syslog_logger)
+    set(SRC_FILES
+            ../syslog.c)
+
+    ConfigureModule(logger syslog_logger)
+
+endif ()

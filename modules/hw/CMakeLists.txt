@@ -4,10 +4,13 @@ project(hw)
 
 include(${vlc_MODULE_HELPER})
 
-set(SUBMODULES
-        vdpau)
+if (HAVE_VAAPI)
+    list(APPEND PLUGINS vaapi)
+endif ()
 
-set(PLUGINS
-        vaapi)
+if (HAVE_VDPAU)
+    list(APPEND SUBMODULES vdpau)
+endif ()
+
 
 ConfigureModuleGroup()

@@ -9,7 +9,6 @@ set(PLUGINS
         adf
         cache_block
         cache_read
-        decomp
         hds
         inflate
         prefetch
@@ -17,8 +16,11 @@ set(PLUGINS
         skiptags)
 
 if (HAVE_ARIBB25)
-    list(APPEND PLUGINS
-            aribcam)
+    list(APPEND PLUGINS aribcam)
+endif ()
+
+if (!WINDOWS)
+    list(APPEND PLUGINS decomp)
 endif ()
 
 ConfigureModuleGroup()

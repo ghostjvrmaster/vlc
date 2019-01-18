@@ -2,8 +2,14 @@ cmake_minimum_required(VERSION 3.10)
 
 project(codec)
 
-add_subdirectory(avcodec)
+include(${vlc_MODULE_HELPER})
 
-add_custom_target(codec)
-add_dependencies(codec
-        codec_avcodec_plugin)
+set(PLUGINS
+        ddummy
+        edummy)
+
+if (HAVE_AVCODEC)
+    list(APPEND PLUGINS avcodec)
+endif ()
+
+ConfigureModuleGroup()

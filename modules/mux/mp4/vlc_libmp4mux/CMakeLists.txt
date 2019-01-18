@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(vlc_libmp4)
+project(vlc_libmp4mux)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 14)
@@ -8,9 +8,13 @@ set(CMAKE_CXX_STANDARD 14)
 include_directories(
         ${vlc_INCLUDE_DIR}
         ${vlc_INCLUDE_DIR}/vlc
-        ${vlc_CONFIG_H_DIR})
+        ${vlc_CONFIG_H_DIR}
+        ../../)
 
 file(GLOB SRC_FILES
-        "libmp4.c")
+        "../libmp4mux.c")
 
 add_library(${PROJECT_NAME} ${SRC_FILES})
+
+target_link_libraries(${PROJECT_NAME}
+        vlc_libh264)

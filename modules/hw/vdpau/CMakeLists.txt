@@ -2,18 +2,22 @@ cmake_minimum_required(VERSION 3.10)
 
 project(hw_vdpau)
 
-include(${vlc_MODULE_HELPER})
+if (HAVE_VDPAU)
 
-set(PLUGINS
-        adjust
-        avcodec
-        chroma
-        deinterlace
-        display
-        sharpen)
+    include(${vlc_MODULE_HELPER})
 
-ConfigureModuleGroup()
+    set(PLUGINS
+            adjust
+            avcodec
+            chroma
+            deinterlace
+            display
+            sharpen)
 
-add_subdirectory(vlc_vdpau)
-add_dependencies(${PROJECT_NAME}
-        vlc_vdpau)
+    ConfigureModuleGroup()
+
+    add_subdirectory(vlc_vdpau)
+    add_dependencies(${PROJECT_NAME}
+            vlc_vdpau)
+
+endif ()

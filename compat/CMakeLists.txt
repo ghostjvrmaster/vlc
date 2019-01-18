@@ -11,6 +11,7 @@ include_directories(
         ${vlc_CONFIG_H_DIR})
 
 file(GLOB SRC_FILES *.c)
+
 file(GLOB NATIVE_CLIENT_SRC_FILES
         flockfile.c
         freeaddrinfo.c
@@ -22,6 +23,32 @@ file(GLOB NATIVE_CLIENT_SRC_FILES
         recvmsg.c
         sendmsg.c
         sigwait.c)
-list(REMOVE_ITEM SRC_FILES ${NATIVE_CLIENT_SRC_FILES})
+
+if (WINDOWS)
+    file(GLOB WINDOWS_REMOVE_ITEMS
+            swab.c)
+
+    list(REMOVE_ITEM SRC_FILES
+            ${NATIVE_CLIENT_SRC_FILES}
+            ${WINDOWS_REMOVE_ITEMS})
+
+    file(GLOB WINDOWS_NEEDED_ITEMS
+            localtime_r.c
+            poll.c
+            sendmsg.c
+            recvmsg.c
+            flockfile.c)
+
+    list(APPEND SRC_FILES
+            ${WINDOWS_NEEDED_ITEMS})
+
+    set(PLATFORM_LINK_LIBRARIES
+            ws2_32)
+elseif (LINUX)
+    list(REMOVE_ITEM SRC_FILES ${NATIVE_CLIENT_SRC_FILES})
+endif ()
 
 add_library(compat ${SRC_FILES})
+
+target_link_libraries(compat
+        ${PLATFORM_LINK_LIBRARIES})

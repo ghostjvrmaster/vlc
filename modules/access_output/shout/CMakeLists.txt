@@ -2,9 +2,13 @@ cmake_minimum_required(VERSION 3.10)
 
 project(access_output_shout_plugin)
 
-include(${vlc_MODULE_HELPER})
+if (HAVE_SHOUT)
 
-file(GLOB SRC_FILES
-        "../shout.c")
+    include(${vlc_MODULE_HELPER})
 
-ConfigureModule(access_output shout)
+    file(GLOB SRC_FILES
+            "../shout.c")
+
+    ConfigureModule(access_output shout)
+
+endif ()

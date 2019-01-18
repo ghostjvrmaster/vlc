@@ -10,7 +10,10 @@ set(PLUGINS
         mono
         remap
         simple
-        spatialaudio
         trivial)
+
+if (HAVE_SPATIALAUDIO)
+    list(APPEND PLUGINS spatialaudio)
+endif ()
 
 ConfigureModuleGroup()

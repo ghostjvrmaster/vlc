@@ -2,16 +2,29 @@ cmake_minimum_required(VERSION 3.10)
 
 project(video_output_opengl_gl_plugin)
 
-include(${vlc_MODULE_HELPER})
+if (HAVE_GL_GLEW_H)
 
-file(GLOB SRC_FILES
-        "../display.c"
-        "../fragment_shaders.c"
-        "../vout_helper.c"
-        "../converter_sw.c")
+    include(${vlc_MODULE_HELPER})
 
-set(MODULE_LIBRARIES
-        GL
-        placebo)
+    file(GLOB SRC_FILES
+            "../display.c"
+            "../fragment_shaders.c"
+            "../vout_helper.c"
+            "../converter_sw.c")
 
-ConfigureModule(video_output gl)
+    if (WINDOWS)
+        set(MODULE_LIBRARIES
+                opengl32)
+    else ()
+        set(MODULE_LIBRARIES
+                GL)
+    endif ()
+
+    if (HAVE_LIBPLACEBO)
+        list(APPEND MODULE_LIBRARIES
+                libplacebo)
+    endif ()
+
+    ConfigureModule(video_output gl)
+
+endif ()

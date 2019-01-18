@@ -36,4 +36,14 @@ set(MODULE_INCLUDE_DIRS
         ../hls
         ../smooth)
 
+set(MODULE_LIBRARIES
+        vlc_libmp4
+        vlc_libmp4mux
+        vlc_libh264
+        ${zlib_LIBRARIES})
+
+if (HAVE_GCRYPT)
+    list(APPEND MODULE_LIBRARIES gcrypt)
+endif ()
+
 ConfigureModule(demux adaptive)

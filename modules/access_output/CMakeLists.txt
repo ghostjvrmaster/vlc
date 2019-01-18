@@ -5,15 +5,21 @@ project(access_output)
 include(${vlc_MODULE_HELPER})
 
 set(PLUGINS
-        dummy;
-        file;
-        http;
-        livehttp;
-        shout;
-        udp;)
-
-ConfigureModuleGroup()
+        dummy
+        file
+        http
+        udp)
 
 if (HAVE_SRT_SRT_H)
-    AddModuleGroupDependency(srt)
+    list(APPEND PLUGINS srt)
 endif ()
+
+if (HAVE_SHOUT)
+    list(APPEND PLUGINS shout)
+endif ()
+
+if (HAVE_GCRYPT)
+    list(APPEND PLUGINS livehttp)
+endif ()
+
+ConfigureModuleGroup()

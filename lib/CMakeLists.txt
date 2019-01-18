@@ -28,6 +28,6 @@ target_link_libraries(vlclib
 
 if (HAVE_DYNAMIC_PLUGINS)
     install(TARGETS vlclib
-            LIBRARY
-            DESTINATION ${LIBDIR})
+            RUNTIME DESTINATION "${BINDIR}"
+            LIBRARY DESTINATION "${LIBDIR}")
 endif ()

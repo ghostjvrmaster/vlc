@@ -1,7 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
 
-add_subdirectory(adaptive)
+project(demux)
 
-add_custom_target(demux)
-add_dependencies(demux
-        demux_adaptive_plugin)
+include(${vlc_MODULE_HELPER})
+
+set(PLUGINS
+        adaptive)
+
+ConfigureModuleGroup()
+
+add_subdirectory(mp4)
+add_dependencies(${PROJECT_NAME}
+        vlc_libmp4)

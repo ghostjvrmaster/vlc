@@ -9,6 +9,8 @@ include(${CMAKE_ROOT}/Modules/FindIconv.cmake)
 include(${CMAKE_ROOT}/Modules/FindLua.cmake)
 include(${CMAKE_CURRENT_LIST_DIR}/PkgConfigHelper.cmake)
 
+include(cmake/DetectOS.cmake)
+
 # Package definitions
 
 set(PACKAGE_VERSION_MAJOR 4)
@@ -25,7 +27,13 @@ set(COPYRIGHT_YEARS "1996-2017")
 set(COPYRIGHT_MESSAGE "Copyright © ${COPYRIGHT_YEARS} the VideoLAN team")
 
 set(VLC_COMPILER ${CMAKE_C_COMPILER})
-set(VLC_COMPILE_BY $ENV{USER})
+if (DEFINED $ENV{USER})
+    set(VLC_COMPILE_BY $ENV{USER})
+elseif (DEFINED $ENV{USERNAME})
+    set(VLC_COMPILE_BY $ENV{USERNAME})
+else ()
+    set(VLC_COMPILE_BY "vlc-user")
+endif ()
 set(VLC_COMPILE_HOST ${CMAKE_HOST_SYSTEM})
 
 set(CONFIGURE_LINE "Configured with CMake")
@@ -36,16 +44,20 @@ set(PACKAGE_STRING "${PACKAGE_NAME} ${PACKAGE_VERSION}")
 
 # Paths
 
-set(PREFIX ${CMAKE_INSTALL_PREFIX})
-set(BINDIR ${PREFIX}/bin)
-set(DATAROOTDIR ${PREFIX}/share)
-set(INCLUDEDIR ${PREFIX}/include)
-set(INFODIR ${DATAROOTDIR}/info)
-set(LIBDIR ${PREFIX}/lib)
-set(LOCALEDIR ${DATAROOTDIR}/locale)
-set(MANDIR ${DATAROOTDIR}/man)
-set(PLUGINDIR ${LIBDIR}/vlc/plugins)
-set(ICONSDIR ${DATAROOTDIR}/icons/hicolor)
+set(PREFIX "${CMAKE_INSTALL_PREFIX}")
+set(BINDIR "${PREFIX}/bin")
+set(DATAROOTDIR "${PREFIX}/share")
+set(INCLUDEDIR "${PREFIX}/include")
+set(INFODIR "${DATAROOTDIR}/info")
+set(LIBDIR "${PREFIX}/lib")
+set(LOCALEDIR "${DATAROOTDIR}/locale")
+set(MANDIR "${DATAROOTDIR}/man")
+set(PLUGINDIR "${LIBDIR}/vlc/plugins")
+set(ICONSDIR "${DATAROOTDIR}/icons/hicolor")
+
+if (WINDOWS)
+    set(PLUGINDIR "${BINDIR}/plugins")
+endif ()
 
 # Check includes
 
@@ -67,8 +79,11 @@ check_include_file("execinfo.h" HAVE_EXECINFO_H)
 check_include_file("features.h" HAVE_FEATURES_H)
 check_include_file("fluidlite.h" HAVE_FLUIDLITE_H)
 check_include_file("fontconfig/fontconfig.h" HAVE_FONTCONFIG_H)
+check_include_file("gcrypt.h" HAVE_GCRYPT)
 check_include_file("getopt.h" HAVE_GETOPT_H)
+check_include_file("GL/glew.h" HAVE_GL_GLEW_H)
 check_include_file("GL/wglew.h" HAVE_GL_WGLEW_H)
+check_include_file("EGL/gl.h" HAVE_EGL_GL_H)
 check_include_file("interface/mmal/mmal.h" HAVE_INTERFACE_MMAL_MMAL_H)
 check_include_file("inttypes.h" HAVE_INTTYPES_H)
 check_include_file("jpeglib.h" HAVE_JPEGLIB_H)
@@ -121,6 +136,7 @@ check_include_file("sys/stat.h" HAVE_SYS_STAT_H)
 check_include_file("sys/types.h" HAVE_SYS_TYPES_H)
 check_include_file("sys/uio.h" HAVE_SYS_UIO_H)
 check_include_file("sys/videoio.h" HAVE_SYS_VIDEOIO_H)
+check_include_file("syslog.h" HAVE_SYSLOG_H)
 check_include_file("threads.h" HAVE_THREADS_H)
 check_include_file("tremor/ivorbiscodec.h" HAVE_TREMOR_IVORBISCODEC_H)
 check_include_file("unistd.h" HAVE_UNISTD_H)
@@ -169,7 +185,6 @@ check_function_exists(getpid HAVE_GETPID)
 check_function_exists(getpwuid_r HAVE_GETPWUID_R)
 check_function_exists(gettext HAVE_GETTEXT)
 check_function_exists(gettimeofday HAVE_GETTIMEOFDAY)
-check_function_exists(gmtime_r HAVE_GMTIME_R)
 check_function_exists(iconv HAVE_ICONV)
 check_function_exists(if_nameindex HAVE_IF_NAMEINDEX)
 check_function_exists(if_nametoindex HAVE_IF_NAMETOINDEX)
@@ -236,7 +251,9 @@ int main() {sincos(0, 0, 0);}"
         HAVE_SINCOS)
 unset(CMAKE_REQUIRED_LIBRARIES)
 
-check_symbol_exists(localtime_r "time.h" HAVE_LOCALTIME_R)
+if (HAVE_UNISTD_H)
+    check_symbol_exists(fdatasync "unistd.h" HAVE_FDATASYNC)
+endif ()
 
 # Check libraries
 
@@ -250,6 +267,17 @@ pkg_check_module_helper(vorbis >=1.1 HAVE_LIBVORBIS)
 pkg_check_module_helper(libprojectM >=2 HAVE_PROJECTM2)
 pkg_check_module_helper(tiger >=0.3.1 HAVE_TIGER)
 pkg_check_module_helper(vdpau "" HAVE_VDPAU)
+pkg_check_module_helper(vaapi "" HAVE_VAAPI)
+pkg_check_module_helper(speex >=1.0.5 HAVE_SPEEX)
+pkg_check_module_helper(soxr >=0.1.2 HAVE_SOXR)
+pkg_check_module_helper(spatialaudio "" HAVE_SPATIALAUDIO)
+pkg_check_module_helper(samplerate "" HAVE_SAMPLERATE)
+pkg_check_module_helper(libpulse >=1.0 HAVE_PULSE)
+pkg_check_module_helper(alsa >=1.0.24 HAVE_ALSA)
+pkg_check_module_helper(zlib "" HAVE_ZLIB)
+pkg_check_module_helper(curses "" HAVE_NCURSES)
+pkg_check_module_helper(xcb "" HAVE_XCB)
+pkg_check_module_helper(shout >=2.1 HAVE_SHOUT)
 
 # Check built-in types
 
@@ -279,6 +307,18 @@ int main() {}"
         HAVE_SOCKADDR_STORAGE)
 
 check_c_source_compiles("
+#define _POSIX_THREAD_SAFE_FUNCTIONS
+#include <time.h>
+int main() {localtime_r(NULL,NULL);}"
+        HAVE_LOCALTIME_R)
+
+check_c_source_compiles("
+#define _POSIX_THREAD_SAFE_FUNCTIONS
+#include <time.h>
+int main() {gmtime_r(NULL,NULL);}"
+        HAVE_GMTIME_R)
+
+check_c_source_compiles("
 #include <sys/socket.h>
 socklen_t foo;
 int main() {}"
@@ -298,6 +338,11 @@ int main() {}"
 set(CMAKE_REQUIRED_LIBRARIES "-lmingw32")
 check_c_source_compiles("int main(){}"
         HAVE_LIBMINGW32)
+unset(CMAKE_REQUIRED_LIBRARIES)
+
+set(CMAKE_REQUIRED_LIBRARIES "-lanl")
+check_c_source_compiles("int main() {}"
+        HAVE_LIBANL)
 unset(CMAKE_REQUIRED_LIBRARIES)
 
 check_c_source_compiles("
@@ -348,11 +393,11 @@ int main() {}"
 if (HAVE_ICONV)
     set(CMAKE_REQUIRED_LIBRARIES Iconv_LIBRARY)
     check_c_source_compiles("
-    #include <stdlib.h>
-    #include <iconv.h>
-    extern \"C\"
-    size_t iconv (iconv_t cd, const char **inbuf, size_t *inbytesleft, char **outbuf, size_t *outbytesleft);
-    int main() {}"
+#include <stdlib.h>
+#include <iconv.h>
+extern \"C\"
+size_t iconv (iconv_t cd, const char **inbuf, size_t *inbytesleft, char **outbuf, size_t *outbytesleft);
+int main() {}"
             IS_ICONV_CONST)
     unset(CMAKE_REQUIRED_LIBRARIES)
     if (IS_ICONV_CONST)
@@ -376,6 +421,7 @@ option(ENABLE_OSS "Enable OSS audio output support (BSD only)" OFF)
 option(ENABLE_OMX "Enable OpenMAX support" OFF)
 option(ENABLE_OPENCV "Enable OpenCV2 support" OFF)
 option(OPTIMIZE_MEMORY "Optimize memory usage" OFF)
+option(WIN32_LEAN_AND_MEAN "Define to limit the scope of <windows.h>" ON)
 
 if (ENABLE_OSS AND NOT (HAVE_SOUNDCARD_H OR HAVE_SYS_SOUNDCARD_H))
     message(ERROR "OSS support enabled but OSS headers not found!")
@@ -390,6 +436,16 @@ endif ()
 
 if ((DEFINED CMAKE_BUILD_TYPE) AND (NOT CMAKE_BUILD_TYPE STREQUAL Debug))
     set(NDEBUG ON)
+endif ()
+
+# Platform overrides
+
+if (WINDOWS)
+    set(HAVE_SOCKADDR_STORAGE ON)
+    set(HAVE_SOCKLEN_T ON)
+    set(HAVE_SS_FAMILY ON)
+    set(HAVE_STRUCT_TIMESPEC ON)
+    set(ENABLE_NLS OFF)
 endif ()
 
 # Save to config.h
@@ -409,8 +465,14 @@ set(HAVE_DYNAMIC_PLUGINS ON)
 if (HAVE_DYNAMIC_PLUGINS)
     add_definitions(-DHAVE_DYNAMIC_PLUGINS)
 endif ()
-set(LIBEXT ".so")
+
+if (WINDOWS)
+    set(LIBEXT ".dll")
+else ()
+    set(LIBEXT ".so")
+endif ()
 add_definitions(-DLIBEXT="${LIBEXT}")
+set(__LIBVLC__ ON)
 
 set(CMAKE_INSTALL_RPATH ${LIBDIR})
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)

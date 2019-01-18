@@ -9,4 +9,9 @@ file(GLOB SRC_FILES
         "../fs.c"
         "../file.c")
 
+if (WINDOWS)
+    set(MODULE_LIBRARIES
+            shlwapi)
+endif ()
+
 ConfigureModule(access filesystem)

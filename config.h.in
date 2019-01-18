@@ -200,6 +200,9 @@
 /* Define to 1 if you have the `fcntl' function. */
 #cmakedefine HAVE_FCNTL 1
 
+/* Define to 1 if you have the `fdatasync' function */
+#cmakedefine HAVE_FDATASYNC 1
+
 /* Define to 1 if you have the `fdopendir' function. */
 #cmakedefine HAVE_FDOPENDIR 1
 
@@ -863,13 +866,15 @@
 #cmakedefine const
 
 /* Alias fdatasync() to fsync() if missing. */
-#cmakedefine fdatasync
+#ifndef HAVE_FDATASYNC
+# define fdatasync fsync
+#endif
 
 /* Define to `__inline__' or `__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */
-#ifndef __cplusplus
-# define inline
-#endif
+//#ifndef __cplusplus
+//# define inline
+//#endif
 
 /* Define to the equivalent of the C99 'restrict' keyword, or to
    nothing if this is not supported.  Do not define if restrict is

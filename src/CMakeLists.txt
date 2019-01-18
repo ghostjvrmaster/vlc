@@ -13,13 +13,12 @@ include_directories(
         ${PROJECT_SOURCE_DIR}
         ${vlc_INCLUDE_DIR}
         ${vlc_INCLUDE_DIR}/vlc
-        ${vlc_CONFIG_H_DIR})
+        ${vlc_CONFIG_H_DIR}
+        ${vlc_COMPAT_INCLUDE_DIR})
 
 # Core sources
 
 file(GLOB ROOT_SRC_FILES *.c)
-file(GLOB MISSING_C_FILE "missing.c")
-list(REMOVE_ITEM ROOT_SRC_FILES ${MISSING_C_FILE})
 file(GLOB CONFIG_SRC_FILES config/*.c)
 file(GLOB EXTRAS_SRC_FILES extras/*.c)
 file(GLOB INPUT_SRC_FILES input/*.c)
@@ -50,10 +49,44 @@ file(GLOB WIN32_SRC_FILES win32/*.c)
 
 file(GLOB TEST_SRC_FILES test/*.c)
 
-set(PLATFORM_SRC_FILES ${LINUX_SRC_FILES})
-file(GLOB EXTRA_POSIX_SRC_FILES posix/getaddrinfo.c)
-list(REMOVE_ITEM POSIX_SRC_FILES ${EXTRA_POSIX_SRC_FILES})
-list(APPEND PLATFORM_SRC_FILES ${POSIX_SRC_FILES})
+if (LINUX)
+    file(GLOB MISSING_C_FILE "missing.c")
+    list(REMOVE_ITEM ROOT_SRC_FILES ${MISSING_C_FILE})
+
+    set(PLATFORM_SRC_FILES ${LINUX_SRC_FILES})
+    file(GLOB EXTRA_POSIX_SRC_FILES posix/getaddrinfo.c)
+    list(REMOVE_ITEM POSIX_SRC_FILES ${EXTRA_POSIX_SRC_FILES})
+    list(APPEND PLATFORM_SRC_FILES ${POSIX_SRC_FILES})
+
+    set(PLATFORM_LINK_LIBRARIES
+            pthread
+            gcrypt)
+
+    if (HAVE_LIBANL)
+        list(APPEND PLATFORM_LINK_LIBRARIES
+                anl)
+    endif ()
+    if (HAVE_DYNAMIC_PLUGINS)
+        list(APPEND PLATFORM_LINK_LIBRARIES
+                dl)
+    endif ()
+elseif (WINDOWS)
+    file(GLOB UPDATE_FILES
+            "misc/update.c"
+            "misc/update_crypto.c")
+    list(REMOVE_ITEM MISC_SRC_FILES ${UPDATE_FILES})
+
+    set(PLATFORM_SRC_FILES ${WIN32_SRC_FILES})
+
+    set(PLATFORM_LINK_LIBRARIES
+            mingw32
+            ws2_32
+            pthread)
+elseif (MACOS)
+    set(PLATFORM_SRC_FILES ${DARWIN_SRC_FILES})
+elseif (ANDROID)
+    set(PLATFORM_SRC_FILES ${ANDROID_SRC_FILES})
+endif ()
 
 if (HAVE_DYNAMIC_PLUGINS)
     set(LIBRARY_MODE "SHARED")
@@ -77,10 +110,7 @@ add_library(vlccore ${LIBRARY_MODE}
         ${PLATFORM_SRC_FILES})
 
 target_link_libraries(vlccore
-        -lanl
-        -ldl
-        -lgcrypt
-        -lpthread
+        ${PLATFORM_LINK_LIBRARIES}
         compat)
 
 if (HAVE_IDN)
@@ -90,6 +120,6 @@ endif ()
 
 if (HAVE_DYNAMIC_PLUGINS)
     install(TARGETS vlccore
-            LIBRARY
-            DESTINATION ${LIBDIR})
+            RUNTIME DESTINATION ${BINDIR}
+            LIBRARY DESTINATION ${LIBDIR})
 endif ()

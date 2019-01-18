@@ -43,14 +43,19 @@ macro(ConfigureModule)
     endif ()
 
     target_link_libraries(${PROJECT_NAME}
-            ${MODULE_LIBRARIES})
+            ${MODULE_LIBRARIES}
+            vlccore)
 
     add_dependencies(${PROJECT_NAME}
             compat)
 
+    if (DEFINED MODULE_LDFLAGS)
+        set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${MODULE_LDFLAGS}")
+    endif ()
+
     install(TARGETS ${PROJECT_NAME}
-            LIBRARY
-            DESTINATION ${PLUGINDIR}/${_outputPath})
+            RUNTIME DESTINATION "${PLUGINDIR}/${_outputPath}"
+            LIBRARY DESTINATION "${PLUGINDIR}/${_outputPath}")
 endmacro()
 
 macro(ConfigureModuleGroup)

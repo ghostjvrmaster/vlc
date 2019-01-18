@@ -70,6 +70,12 @@
 #endif
 #endif
 
+#ifdef _WIN32
+# define SHUT_RD SD_RECEIVE
+# define SHUT_WR SD_SEND
+# define SHUT_RDWR SD_BOTH
+#endif
+
 #ifndef HAVE_LLDIV
 typedef struct
 {
@@ -84,7 +90,8 @@ typedef struct
 #endif
 
 #if !defined (HAVE_REWIND) || \
-    !defined (HAVE_GETDELIM)
+    !defined (HAVE_GETDELIM) || \
+    defined(_WIN32)
 # include <stdio.h> /* FILE */
 #endif
 

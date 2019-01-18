@@ -2,10 +2,14 @@ cmake_minimum_required(VERSION 3.10)
 
 project(gui)
 
-add_subdirectory(ncurses)
-add_subdirectory(qt)
+include(${vlc_MODULE_HELPER})
 
-add_custom_target(gui)
-add_dependencies(gui
-        gui_ncurses_plugin
-        gui_qt_plugin)
+set(PLUGINS
+        qt)
+
+if (HAVE_NCURSES)
+    list(APPEND PLUGINS
+            qt)
+endif ()
+
+ConfigureModuleGroup()

@@ -2,8 +2,14 @@ cmake_minimum_required(VERSION 3.10)
 
 project(control)
 
-add_subdirectory(dummy)
+include(${vlc_MODULE_HELPER})
 
-add_custom_target(control)
-add_dependencies(control
-        control_dummy_plugin)
+set(PLUGINS
+        dummy)
+
+ConfigureModuleGroup()
+
+add_subdirectory(vlc_libmotion)
+
+add_dependencies(${PROJECT_NAME}
+        vlc_libmotion)
