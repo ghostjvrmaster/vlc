@@ -8,6 +8,9 @@ set(PLUGINS
         ddummy
         edummy)
 
+set(SUBMODULES
+        omxil)
+
 if (HAVE_AVCODEC)
     list(APPEND PLUGINS avcodec)
 endif ()

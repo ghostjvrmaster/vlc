@@ -5,8 +5,11 @@ project(video_splitter)
 include(${vlc_MODULE_HELPER})
 
 set(PLUGINS
-        clone;
-        panoramix;
-        wall;)
+        clone
+        wall)
+
+if (HAVE_XCB)
+    list(APPEND PLUGINS panoramix)
+endif ()
 
 ConfigureModuleGroup()

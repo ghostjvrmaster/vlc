@@ -13,7 +13,6 @@ set(PLUGINS chain
         i422_i420
         i422_yuy2
         rv32
-        swscale
         yuvp
         yuy2_i420
         yuy2_i422)
@@ -24,6 +23,10 @@ endif ()
 
 if (ENABLE_OMX)
     list(APPEND PLUGINS omxdl)
+endif ()
+
+if (HAVE_LIBSWSCALE_SWSCALE_H)
+    list(APPEND PLUGINS swscale)
 endif ()
 
 ConfigureModuleGroup()

@@ -33,6 +33,8 @@
 #include <string.h>
 #include <jni.h>
 
+#include <errno.h>
+
 static JavaVM *s_jvm = NULL;
 #define GENERIC_DIR_COUNT (VLC_VIDEOS_DIR - VLC_DESKTOP_DIR + 1)
 static char *ppsz_generic_names[GENERIC_DIR_COUNT] = {};

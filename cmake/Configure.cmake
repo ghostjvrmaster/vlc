@@ -1,13 +1,12 @@
-include(${CMAKE_ROOT}/Modules/CheckCSourceCompiles.cmake)
-include(${CMAKE_ROOT}/Modules/CheckCXXSourceCompiles.cmake)
-include(${CMAKE_ROOT}/Modules/CheckFunctionExists.cmake)
-include(${CMAKE_ROOT}/Modules/CheckIncludeFile.cmake)
-include(${CMAKE_ROOT}/Modules/CheckLibraryExists.cmake)
-include(${CMAKE_ROOT}/Modules/CheckSymbolExists.cmake)
-include(${CMAKE_ROOT}/Modules/CheckTypeSize.cmake)
-include(${CMAKE_ROOT}/Modules/FindIconv.cmake)
-include(${CMAKE_ROOT}/Modules/FindLua.cmake)
-include(${CMAKE_CURRENT_LIST_DIR}/PkgConfigHelper.cmake)
+include(CheckCSourceCompiles)
+include(CheckCXXSourceCompiles)
+include(CheckFunctionExists)
+include(CheckLibraryExists)
+include(CheckSymbolExists)
+include(CheckTypeSize)
+include(FindIconv)
+include(FindLua)
+include(${CMAKE_CURRENT_LIST_DIR}/configure/PkgConfigHelper.cmake)
 
 include(cmake/DetectOS.cmake)
 
@@ -54,12 +53,19 @@ set(LOCALEDIR "${DATAROOTDIR}/locale")
 set(MANDIR "${DATAROOTDIR}/man")
 set(PLUGINDIR "${LIBDIR}/vlc/plugins")
 set(ICONSDIR "${DATAROOTDIR}/icons/hicolor")
+set(ARCHIVEDIR "${LIBDIR}")
 
 if (WINDOWS)
     set(PLUGINDIR "${BINDIR}/plugins")
 endif ()
 
 # Check includes
+
+if (NOT CMAKE_CROSSCOMPILING)
+    include(CheckCSourceCompiles)
+else ()
+    include(${CMAKE_CURRENT_LIST_DIR}/configure/CheckIncludes.cmake)
+endif ()
 
 check_include_file("a52dec/a52.h" HAVE_A52DEC_A52_H)
 check_include_file("altivec.h" HAVE_ALTIVEC_H)
@@ -137,6 +143,7 @@ check_include_file("sys/types.h" HAVE_SYS_TYPES_H)
 check_include_file("sys/uio.h" HAVE_SYS_UIO_H)
 check_include_file("sys/videoio.h" HAVE_SYS_VIDEOIO_H)
 check_include_file("syslog.h" HAVE_SYSLOG_H)
+check_include_file("systemd/sd-journal.h" HAVE_SYSTEMD_SD_JOURNAL_H)
 check_include_file("threads.h" HAVE_THREADS_H)
 check_include_file("tremor/ivorbiscodec.h" HAVE_TREMOR_IVORBISCODEC_H)
 check_include_file("unistd.h" HAVE_UNISTD_H)
@@ -186,7 +193,6 @@ check_function_exists(getpwuid_r HAVE_GETPWUID_R)
 check_function_exists(gettext HAVE_GETTEXT)
 check_function_exists(gettimeofday HAVE_GETTIMEOFDAY)
 check_function_exists(iconv HAVE_ICONV)
-check_function_exists(if_nameindex HAVE_IF_NAMEINDEX)
 check_function_exists(if_nametoindex HAVE_IF_NAMETOINDEX)
 check_function_exists(inet_pton HAVE_INET_PTON)
 check_function_exists(isatty HAVE_ISATTY)
@@ -257,33 +263,34 @@ endif ()
 
 # Check libraries
 
-pkg_check_module_helper(aribb24 >=1.0.1 HAVE_ARIBB24)
-pkg_check_module_helper(libavcodec "" HAVE_AVCODEC)
-pkg_check_module_helper(libavutil "" HAVE_AVUTIL)
-pkg_check_module_helper(libidn "" HAVE_IDN)
-pkg_check_module_helper(libcddb >=0.9.5 HAVE_LIBCDDB)
-pkg_check_module_helper(libplacebo >=0.1 HAVE_LIBPLACEBO)
-pkg_check_module_helper(vorbis >=1.1 HAVE_LIBVORBIS)
-pkg_check_module_helper(libprojectM >=2 HAVE_PROJECTM2)
-pkg_check_module_helper(tiger >=0.3.1 HAVE_TIGER)
-pkg_check_module_helper(vdpau "" HAVE_VDPAU)
-pkg_check_module_helper(vaapi "" HAVE_VAAPI)
-pkg_check_module_helper(speex >=1.0.5 HAVE_SPEEX)
-pkg_check_module_helper(soxr >=0.1.2 HAVE_SOXR)
-pkg_check_module_helper(spatialaudio "" HAVE_SPATIALAUDIO)
-pkg_check_module_helper(samplerate "" HAVE_SAMPLERATE)
-pkg_check_module_helper(libpulse >=1.0 HAVE_PULSE)
-pkg_check_module_helper(alsa >=1.0.24 HAVE_ALSA)
-pkg_check_module_helper(zlib "" HAVE_ZLIB)
-pkg_check_module_helper(curses "" HAVE_NCURSES)
-pkg_check_module_helper(xcb "" HAVE_XCB)
-pkg_check_module_helper(shout >=2.1 HAVE_SHOUT)
+if (NOT CMAKE_CROSSCOMPILING)
+    pkg_check_module_helper(aribb24 >=1.0.1 HAVE_ARIBB24)
+    pkg_check_module_helper(libavcodec "" HAVE_AVCODEC)
+    pkg_check_module_helper(libavutil "" HAVE_AVUTIL)
+    pkg_check_module_helper(libidn "" HAVE_IDN)
+    pkg_check_module_helper(libcddb >=0.9.5 HAVE_LIBCDDB)
+    pkg_check_module_helper(libplacebo >=0.1 HAVE_LIBPLACEBO)
+    pkg_check_module_helper(vorbis >=1.1 HAVE_LIBVORBIS)
+    pkg_check_module_helper(libprojectM >=2 HAVE_PROJECTM2)
+    pkg_check_module_helper(tiger >=0.3.1 HAVE_TIGER)
+    pkg_check_module_helper(vdpau "" HAVE_VDPAU)
+    pkg_check_module_helper(vaapi "" HAVE_VAAPI)
+    pkg_check_module_helper(speex >=1.0.5 HAVE_SPEEX)
+    pkg_check_module_helper(soxr >=0.1.2 HAVE_SOXR)
+    pkg_check_module_helper(spatialaudio "" HAVE_SPATIALAUDIO)
+    pkg_check_module_helper(samplerate "" HAVE_SAMPLERATE)
+    pkg_check_module_helper(libpulse >=1.0 HAVE_PULSE)
+    pkg_check_module_helper(alsa >=1.0.24 HAVE_ALSA)
+    pkg_check_module_helper(zlib "" HAVE_ZLIB)
+    pkg_check_module_helper(ncursesw "" HAVE_NCURSESW)
+    pkg_check_module_helper(xcb "" HAVE_XCB)
+    pkg_check_module_helper(shout >=2.1 HAVE_SHOUT)
+endif ()
 
 # Check built-in types
 
 check_type_size(max_align_t MAX_ALIGN_T)
 check_type_size(PROCESS_MITIGATION_IMAGE_LOAD_POLICY PROCESS_MITIGATION_IMAGE_LOAD_POLICY)
-check_type_size("struct timespec" STRUCT_TIMESPEC)
 check_type_size(ssize_t SSIZE_T)
 
 # Compile checks
@@ -317,6 +324,12 @@ check_c_source_compiles("
 #include <time.h>
 int main() {gmtime_r(NULL,NULL);}"
         HAVE_GMTIME_R)
+
+check_c_source_compiles("
+#include <time.h>
+struct timespec foo;
+int main() {}"
+        HAVE_STRUCT_TIMESPEC)
 
 check_c_source_compiles("
 #include <sys/socket.h>
@@ -407,6 +420,13 @@ int main() {}"
     endif ()
 endif ()
 
+check_c_source_compiles("
+#include <net/if.h>
+struct if_nameindex foo;
+int main() {}"
+        HAVE_IF_NAMEINDEX)
+
+
 # Check CPU features
 # TODO: enable cpu optimization features
 
@@ -422,6 +442,7 @@ option(ENABLE_OMX "Enable OpenMAX support" OFF)
 option(ENABLE_OPENCV "Enable OpenCV2 support" OFF)
 option(OPTIMIZE_MEMORY "Optimize memory usage" OFF)
 option(WIN32_LEAN_AND_MEAN "Define to limit the scope of <windows.h>" ON)
+option(HAVE_DYNAMIC_PLUGINS "Disable to build as a single static library" ON)
 
 if (ENABLE_OSS AND NOT (HAVE_SOUNDCARD_H OR HAVE_SYS_SOUNDCARD_H))
     message(ERROR "OSS support enabled but OSS headers not found!")
@@ -446,6 +467,9 @@ if (WINDOWS)
     set(HAVE_SS_FAMILY ON)
     set(HAVE_STRUCT_TIMESPEC ON)
     set(ENABLE_NLS OFF)
+elseif (ANDROID)
+    set(HAVE_DYNAMIC_PLUGINS OFF)
+    set(ENABLE_NLS OFF)
 endif ()
 
 # Save to config.h
@@ -460,8 +484,7 @@ add_definitions(-DLOCALEDIR="${LOCALEDIR}")
 add_definitions(-DPACKAGE_NAME="${PACKAGE_NAME}")
 add_definitions(-DPKGLIBDIR="${LIBDIR}")
 add_definitions(-DPKGDATADIR="${DATAROOTDIR}")
-# TODO: platform-specific
-set(HAVE_DYNAMIC_PLUGINS ON)
+
 if (HAVE_DYNAMIC_PLUGINS)
     add_definitions(-DHAVE_DYNAMIC_PLUGINS)
 endif ()

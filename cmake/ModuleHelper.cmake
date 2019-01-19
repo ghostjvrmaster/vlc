@@ -23,10 +23,14 @@ macro(ConfigureModule)
     remove_definitions(-DMODULE_STRING)
     set(MODULE_STRING ${_moduleString})
     add_definitions(-DMODULE_STRING="${MODULE_STRING}")
+
+    set(LIBRARY_MODE "SHARED")
     if (HAVE_DYNAMIC_PLUGINS)
         add_definitions(-D__PLUGIN__)
     else ()
-        add_definitions(-DMODULE_NAME="${MODULE_STRING}")
+        add_definitions(-DMODULE_NAME=${MODULE_STRING})
+        set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+        set(LIBRARY_MODE "STATIC")
     endif ()
 
     include_directories(
@@ -35,9 +39,10 @@ macro(ConfigureModule)
             ${vlc_CONFIG_H_DIR}
             ${MODULE_INCLUDE_DIRS})
 
-    add_library(${PROJECT_NAME} SHARED
+    add_library(${PROJECT_NAME} ${LIBRARY_MODE}
             ${SRC_FILES})
 
+    set_target_properties(${PROJECT_NAME} PROPERTIES MODULE_STRING ${_moduleString})
     if (DEFINED _outputName)
         set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${_outputName})
     endif ()
@@ -55,7 +60,8 @@ macro(ConfigureModule)
 
     install(TARGETS ${PROJECT_NAME}
             RUNTIME DESTINATION "${PLUGINDIR}/${_outputPath}"
-            LIBRARY DESTINATION "${PLUGINDIR}/${_outputPath}")
+            LIBRARY DESTINATION "${PLUGINDIR}/${_outputPath}"
+            ARCHIVE DESTINATION "${ARCHIVEDIR}")
 endmacro()
 
 macro(ConfigureModuleGroup)

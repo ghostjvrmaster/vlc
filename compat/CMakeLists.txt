@@ -44,7 +44,7 @@ if (WINDOWS)
 
     set(PLATFORM_LINK_LIBRARIES
             ws2_32)
-elseif (LINUX)
+else ()
     list(REMOVE_ITEM SRC_FILES ${NATIVE_CLIENT_SRC_FILES})
 endif ()
 

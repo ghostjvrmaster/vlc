@@ -26,8 +26,16 @@ target_link_libraries(vlclib
         -lm
         vlccore)
 
-if (HAVE_DYNAMIC_PLUGINS)
-    install(TARGETS vlclib
-            RUNTIME DESTINATION "${BINDIR}"
-            LIBRARY DESTINATION "${LIBDIR}")
-endif ()
+install(TARGETS vlclib
+        RUNTIME DESTINATION "${BINDIR}"
+        LIBRARY DESTINATION "${LIBDIR}"
+        ARCHIVE DESTINATION "${ARCHIVEDIR}")
+
+file(GLOB PLUGIN_HEADER_SRC_FILES
+        ../include/*.h)
+file(GLOB CORE_HEADER_SRC_FILES
+        ../include/vlc/*.h)
+install(FILES ${PLUGIN_HEADER_SRC_FILES}
+        DESTINATION "${INCLUDEDIR}")
+install(FILES ${CORE_HEADER_SRC_FILES}
+        DESTINATION "${INCLUDEDIR}/vlc")

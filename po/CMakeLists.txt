@@ -2,15 +2,19 @@ cmake_minimum_required(VERSION 3.10)
 
 project(po)
 
-file(READ "LINGUAS" languages)
-string(REGEX REPLACE "\n" ";" languages "${languages}")
+if (NOT CMAKE_CROSSCOMPILING)
 
-foreach (gmo IN LISTS languages)
-    if (gmo)
-        install(FILES "${gmo}.gmo"
-                DESTINATION ${LOCALEDIR}/${gmo}/LC_MESSAGES
-                RENAME "vlc.mo")
-    endif ()
-endforeach ()
+    file(READ "LINGUAS" languages)
+    string(REGEX REPLACE "\n" ";" languages "${languages}")
 
-add_custom_target(po)
+    foreach (gmo IN LISTS languages)
+        if (gmo)
+            install(FILES "${gmo}.gmo"
+                    DESTINATION ${LOCALEDIR}/${gmo}/LC_MESSAGES
+                    RENAME "vlc.mo")
+        endif ()
+    endforeach ()
+
+    add_custom_target(po)
+
+endif ()

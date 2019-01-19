@@ -29,6 +29,10 @@ file(GLOB NETWORK_SRC_FILES network/*.c)
 file(GLOB PLAYLIST_SRC_FILES playlist/*.c)
 file(GLOB TEXT_SRC_FILES text/*.c)
 
+file(GLOB UPDATE_FILES
+        "misc/update.c"
+        "misc/update_crypto.c")
+
 # Output sources
 
 file(GLOB AUDIO_OUTPUT_SRC_FILES audio_output/*.c)
@@ -60,7 +64,8 @@ if (LINUX)
 
     set(PLATFORM_LINK_LIBRARIES
             pthread
-            gcrypt)
+            gcrypt
+            m)
 
     if (HAVE_LIBANL)
         list(APPEND PLATFORM_LINK_LIBRARIES
@@ -71,9 +76,6 @@ if (LINUX)
                 dl)
     endif ()
 elseif (WINDOWS)
-    file(GLOB UPDATE_FILES
-            "misc/update.c"
-            "misc/update_crypto.c")
     list(REMOVE_ITEM MISC_SRC_FILES ${UPDATE_FILES})
 
     set(PLATFORM_SRC_FILES ${WIN32_SRC_FILES})
@@ -85,6 +87,8 @@ elseif (WINDOWS)
 elseif (MACOS)
     set(PLATFORM_SRC_FILES ${DARWIN_SRC_FILES})
 elseif (ANDROID)
+    list(REMOVE_ITEM MISC_SRC_FILES ${UPDATE_FILES})
+
     set(PLATFORM_SRC_FILES ${ANDROID_SRC_FILES})
 endif ()
 
@@ -118,8 +122,7 @@ if (HAVE_IDN)
             ${libidn_LIBRARIES})
 endif ()
 
-if (HAVE_DYNAMIC_PLUGINS)
-    install(TARGETS vlccore
-            RUNTIME DESTINATION ${BINDIR}
-            LIBRARY DESTINATION ${LIBDIR})
-endif ()
+install(TARGETS vlccore
+        RUNTIME DESTINATION "${BINDIR}"
+        LIBRARY DESTINATION "${LIBDIR}"
+        ARCHIVE DESTINATION "${ARCHIVEDIR}")

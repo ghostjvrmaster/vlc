@@ -2,6 +2,8 @@
 
 #include <vlc/vlc.h>
 
+#include <vlc-simple_static-modules.h>
+
 int main(int argc, const char **argv) {
     libvlc_instance_t *vlc = libvlc_new(argc, argv);
 

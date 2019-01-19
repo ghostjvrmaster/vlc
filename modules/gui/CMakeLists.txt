@@ -4,12 +4,13 @@ project(gui)
 
 include(${vlc_MODULE_HELPER})
 
-set(PLUGINS
-        qt)
+if (NOT ANDROID)
+    list(APPEND PLUGINS qt)
+endif ()
 
-if (HAVE_NCURSES)
+if (HAVE_NCURSESW)
     list(APPEND PLUGINS
-            qt)
+            ncurses)
 endif ()
 
 ConfigureModuleGroup()

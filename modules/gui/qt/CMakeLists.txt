@@ -32,7 +32,7 @@ file(GLOB SRC_FILES
 file(GLOB WIN32_SRC_FILES
         "main_interface_win32.*")
 
-if (!WINDOWS)
+if (NOT WINDOWS)
     list(REMOVE_ITEM SRC_FILES ${WIN32_SRC_FILES})
 endif ()
 
