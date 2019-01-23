@@ -8,7 +8,3 @@ set(PLUGINS
         mp4)
 
 ConfigureModuleGroup()
-
-add_subdirectory(vlc_libmp4mux)
-add_dependencies(${PROJECT_NAME}
-        vlc_libmp4mux)

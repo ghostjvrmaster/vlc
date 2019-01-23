@@ -5,9 +5,7 @@ project(video_filter_rotate_plugin)
 include(${vlc_MODULE_HELPER})
 
 file(GLOB SRC_FILES
-        "../rotate.c")
-
-set(MODULE_LIBRARIES
-        vlc_libmotion)
+        "../rotate.c"
+        "../../control/motionlib.c")
 
 ConfigureModule(video_filter rotate)

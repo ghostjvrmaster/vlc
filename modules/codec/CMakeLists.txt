@@ -14,5 +14,8 @@ set(SUBMODULES
 if (HAVE_AVCODEC)
     list(APPEND PLUGINS avcodec)
 endif ()
+if (IOS OR MACOS)
+    list(APPEND PLUGINS videotoolbox)
+endif ()
 
 ConfigureModuleGroup()

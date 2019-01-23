@@ -3,6 +3,10 @@
 #  Output: <TARGET>_static-modules.h
 #
 macro(GenerateStaticModuleList _target _moduleList)
+    if (HAVE_DYNAMIC_PLUGINS)
+        return()
+    endif ()
+
     get_property(previousModules CACHE "${_target}-MODULE_LIST" PROPERTY VALUE)
     set(buildHeader ON)
     if (previousModules)

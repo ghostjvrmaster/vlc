@@ -18,9 +18,12 @@ file(GLOB SRC_FILES
         "../dash/*.cpp"
         "../dash/mp4/*.cpp"
         "../dash/mpd/*.cpp"
+        "../mp4/libmp4.c"
         "../smooth/*.cpp"
         "../smooth/mp4/*.cpp"
-        "../smooth/playlist/*.cpp")
+        "../smooth/playlist/*.cpp"
+        "../../mux/mp4/libmp4mux.c"
+        "../../packetizer/h*.c")
 
 set(MODULE_INCLUDE_DIRS
         ${CMAKE_CURRENT_LIST_DIR}
@@ -37,9 +40,6 @@ set(MODULE_INCLUDE_DIRS
         ../smooth)
 
 set(MODULE_LIBRARIES
-        vlc_libmp4
-        vlc_libmp4mux
-        vlc_libh264
         ${zlib_LIBRARIES})
 
 if (HAVE_GCRYPT)

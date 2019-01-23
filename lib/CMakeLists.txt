@@ -5,6 +5,8 @@ project(lib)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 14)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 include_directories(
         ${vlc_INCLUDE_DIR}
         ${vlc_INCLUDE_DIR}/vlc

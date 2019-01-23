@@ -8,8 +8,3 @@ set(PLUGINS
         dummy)
 
 ConfigureModuleGroup()
-
-add_subdirectory(vlc_libmotion)
-
-add_dependencies(${PROJECT_NAME}
-        vlc_libmotion)

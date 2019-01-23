@@ -61,7 +61,7 @@ macro(ConfigureModule)
     install(TARGETS ${PROJECT_NAME}
             RUNTIME DESTINATION "${PLUGINDIR}/${_outputPath}"
             LIBRARY DESTINATION "${PLUGINDIR}/${_outputPath}"
-            ARCHIVE DESTINATION "${ARCHIVEDIR}")
+            ARCHIVE DESTINATION "${ARCHIVEDIR}/${_outputPath}")
 endmacro()
 
 macro(ConfigureModuleGroup)

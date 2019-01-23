@@ -8,7 +8,3 @@ set(PLUGINS
         adaptive)
 
 ConfigureModuleGroup()
-
-add_subdirectory(mp4)
-add_dependencies(${PROJECT_NAME}
-        vlc_libmp4)

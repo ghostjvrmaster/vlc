@@ -8,9 +8,7 @@ set(MODULE_INCLUDE_DIRS
         ../../)
 
 file(GLOB SRC_FILES
-        "../mp4.c")
-
-set(MODULE_LIBRARIES
-        vlc_libmp4mux)
+        "../mp4.c"
+        "../libmp4mux.c")
 
 ConfigureModule(mux mp4)
