@@ -26,6 +26,7 @@ file(GLOB NATIVE_CLIENT_SRC_FILES
 
 if (WINDOWS)
     file(GLOB WINDOWS_REMOVE_ITEMS
+            strcasecmp.c
             swab.c)
 
     list(REMOVE_ITEM SRC_FILES
@@ -38,6 +39,8 @@ if (WINDOWS)
             sendmsg.c
             recvmsg.c
             flockfile.c)
+
+    add_compile_options("-Wno-unused-result")
 
     list(APPEND SRC_FILES
             ${WINDOWS_NEEDED_ITEMS})
@@ -52,3 +55,6 @@ add_library(compat ${SRC_FILES})
 
 target_link_libraries(compat
         ${PLATFORM_LINK_LIBRARIES})
+
+install(TARGETS compat
+        ARCHIVE DESTINATION ${ARCHIVEDIR})

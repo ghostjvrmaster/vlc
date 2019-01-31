@@ -443,6 +443,7 @@ option(ENABLE_OPENCV "Enable OpenCV2 support" OFF)
 option(OPTIMIZE_MEMORY "Optimize memory usage" OFF)
 option(WIN32_LEAN_AND_MEAN "Define to limit the scope of <windows.h>" ON)
 option(HAVE_DYNAMIC_PLUGINS "Disable to build as a single static library" ON)
+option(ENABLE_BINARIES "Disable to skip building vlc executables" ON)
 
 if (ENABLE_OSS AND NOT (HAVE_SOUNDCARD_H OR HAVE_SYS_SOUNDCARD_H))
     message(ERROR "OSS support enabled but OSS headers not found!")

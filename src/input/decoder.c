@@ -1751,6 +1751,7 @@ static decoder_t * CreateDecoder( vlc_object_t *p_parent,
     p_owner->p_resource = p_resource;
     p_owner->p_aout = NULL;
     p_owner->p_vout = NULL;
+    p_owner->p_misc_out = NULL;
     p_owner->p_spu_vout = NULL;
     p_owner->i_spu_channel = 0;
     p_owner->i_spu_order = 0;

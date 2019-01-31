@@ -23,7 +23,12 @@ file(GLOB SRC_FILES
         "../smooth/mp4/*.cpp"
         "../smooth/playlist/*.cpp"
         "../../mux/mp4/libmp4mux.c"
-        "../../packetizer/h*.c")
+        "../../packetizer/hxxx_sei.c"
+        "../../packetizer/hxxx_nal.c"
+        "../../packetizer/hxxx_common.c"
+        "../../packetizer/hevc_nal.c"
+        "../../packetizer/h264_slice.c"
+        "../../packetizer/h264_nal.c")
 
 set(MODULE_INCLUDE_DIRS
         ${CMAKE_CURRENT_LIST_DIR}

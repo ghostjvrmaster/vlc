@@ -9,6 +9,9 @@ set(MODULE_INCLUDE_DIRS
 
 file(GLOB SRC_FILES
         "../mp4.c"
-        "../libmp4mux.c")
+        "../libmp4mux.c"
+        "../../../packetizer/hxxx*.c"
+        "../../../packetizer/h264_*.c"
+        "../../../packetizer/hevc_nal.c")
 
 ConfigureModule(mux mp4)

@@ -8,7 +8,7 @@ if (NOT ANDROID)
     list(APPEND PLUGINS qt)
 endif ()
 
-if (HAVE_NCURSESW)
+if (HAVE_NCURSESW AND NOT WINDOWS)
     list(APPEND PLUGINS
             ncurses)
 endif ()

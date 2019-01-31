@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(bin)
 
-if (NOT ANDROID)
+if (ENABLE_BINARIES AND NOT ANDROID)
 
     include(../cmake/GenerateStaticModuleList.cmake)
 
@@ -68,16 +68,20 @@ if (NOT ANDROID)
     target_link_libraries(vlc-simple
             vlclib)
 
-    set(vlc_simple_PLUGINS
-            control_dummy_plugin
-            demux_adaptive_plugin
-            access_fs_plugin
-            access_http_plugin
-            codec_avcodec_plugin
-            logger_console_plugin
-            logger_file_plugin)
+    if (NOT HAVE_DYNAMIC_MODULES)
+        set(static_plugins
+                control_dummy_plugin
+                demux_adaptive_plugin
+                access_fs_plugin
+                access_http_plugin
+                codec_avcodec_plugin
+                logger_console_plugin
+                logger_file_plugin)
 
-    GenerateStaticModuleList(vlc-simple vlc_simple_PLUGINS)
+        GenerateStaticModuleList(vlc static_plugins)
+        GenerateStaticModuleList(vlc-cache-gen static_plugins)
+        GenerateStaticModuleList(vlc-simple static_plugins)
+    endif ()
 
     install(TARGETS vlc vlc-cache-gen vlc-simple
             RUNTIME DESTINATION ${BINDIR})

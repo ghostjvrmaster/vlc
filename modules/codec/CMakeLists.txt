@@ -12,7 +12,7 @@ set(SUBMODULES
         omxil)
 
 if (HAVE_AVCODEC)
-    list(APPEND PLUGINS avcodec)
+    list(APPEND SUBMODULES avcodec)
 endif ()
 if (IOS OR MACOS)
     list(APPEND PLUGINS videotoolbox)
