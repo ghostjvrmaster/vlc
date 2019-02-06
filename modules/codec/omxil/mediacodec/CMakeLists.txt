@@ -14,6 +14,10 @@ file(GLOB SRC_FILES
         "../mediacodec_ndk.c"
         "../omxil_core.c"
         "../qcom.c"
-        "../utils.c")
+        "../utils.c"
+        "../../hxxx_helper.c"
+        "../../../packetizer/hxxx_*.c"
+        "../../../packetizer/h264_*.c"
+        "../../../video_output/android/utils.c")
 
 ConfigureModule(codec mediacodec)

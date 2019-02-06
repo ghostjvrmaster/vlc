@@ -351,8 +351,10 @@ char* MediaCodec_GetName(vlc_object_t *p_obj, const char *psz_mime,
         name_len = (*env)->GetStringUTFLength(env, name);
         name_ptr = (*env)->GetStringUTFChars(env, name, NULL);
 
-        if (OMXCodec_IsBlacklisted(name_ptr, name_len))
-            goto loopclean;
+        if(strstr(psz_mime, "audio/") == NULL) {
+            if (OMXCodec_IsBlacklisted(name_ptr, name_len))
+                goto loopclean;
+        }
 
         if ((*env)->CallBooleanMethod(env, info, jfields.is_encoder))
             goto loopclean;

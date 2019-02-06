@@ -180,7 +180,7 @@ vlc_module_begin ()
     set_category(CAT_INPUT)
     set_subcategory(SUBCAT_INPUT_VCODEC)
     set_section(N_("Decoding"), NULL)
-    set_capability("video decoder", 0) /* Only enabled via commandline arguments */
+    set_capability("video decoder", 1) /* Only enabled via commandline arguments */
     add_bool(CFG_PREFIX "dr", true,
              DIRECTRENDERING_TEXT, DIRECTRENDERING_LONGTEXT, true)
     add_bool(CFG_PREFIX "audio", false,
@@ -190,7 +190,7 @@ vlc_module_begin ()
     set_callbacks(OpenDecoderNdk, CloseDecoder)
     add_shortcut("mediacodec_ndk")
     add_submodule ()
-        set_capability("audio decoder", 0)
+        set_capability("audio decoder", 1)
         set_callbacks(OpenDecoderNdk, CloseDecoder)
         add_shortcut("mediacodec_ndk")
     add_submodule ()
@@ -539,8 +539,8 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
         /* Not all mediacodec versions can handle a size of 0. Hopefully, the
          * packetizer will trigger a decoder restart when a new video size is
          * found. */
-        if (!p_dec->fmt_in.video.i_width || !p_dec->fmt_in.video.i_height)
-            return VLC_EGENERIC;
+//        if (!p_dec->fmt_in.video.i_width || !p_dec->fmt_in.video.i_height)
+//            return VLC_EGENERIC;
 
         switch (p_dec->fmt_in.i_codec) {
         case VLC_CODEC_HEVC: mime = "video/hevc"; break;

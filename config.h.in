@@ -61,7 +61,7 @@
 #cmakedefine COPYRIGHT_MESSAGE "@COPYRIGHT_MESSAGE@"
 
 /* The copyright years */
-#cmakedefine COPYRIGHT_YEARS "@COPYRIGHT_YEARS"
+#cmakedefine COPYRIGHT_YEARS "@COPYRIGHT_YEARS@"
 
 /* Default font family */
 #cmakedefine DEFAULT_FAMILY

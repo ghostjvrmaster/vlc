@@ -91,7 +91,18 @@ elseif (MACOS)
 elseif (ANDROID)
     list(REMOVE_ITEM MISC_SRC_FILES ${UPDATE_FILES})
 
-    set(PLATFORM_SRC_FILES ${ANDROID_SRC_FILES})
+    set(PLATFORM_SRC_FILES
+            ${ANDROID_SRC_FILES}
+            ${LINUX_SRC_FILES}
+            ${POSIX_SRC_FILES})
+
+    file(GLOB UNUSED_FILES
+            posix/error.c
+            posix/specific.c
+            posix/thread.c
+            linux/getaddrinfo.c)
+
+    list(REMOVE_ITEM PLATFORM_SRC_FILES ${UNUSED_FILES})
 endif ()
 
 if (HAVE_DYNAMIC_PLUGINS)

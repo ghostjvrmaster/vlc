@@ -4,4 +4,10 @@ project(packetizer)
 
 include(${vlc_MODULE_HELPER})
 
+set(PLUGINS
+        h264
+        hevc
+        mpeg4audio
+        mpeg4video)
+
 ConfigureModuleGroup()

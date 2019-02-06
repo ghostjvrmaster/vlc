@@ -47,6 +47,22 @@ if (WINDOWS)
 
     set(PLATFORM_LINK_LIBRARIES
             ws2_32)
+elseif (ANDROID)
+    file(GLOB ANDROID_REMOVE_ITEMS
+            asprintf.c
+            atoll.c
+            dirfd.c
+            fdopendir.c
+            getdelim.c
+            gmtime_r.c
+            rewind.c
+            setenv.c
+            strcasecmp.c
+            strtoll.c
+            timegm.c)
+    list(REMOVE_ITEM SRC_FILES
+            ${NATIVE_CLIENT_SRC_FILES}
+            ${ANDROID_REMOVE_ITEMS})
 else ()
     list(REMOVE_ITEM SRC_FILES ${NATIVE_CLIENT_SRC_FILES})
 endif ()
