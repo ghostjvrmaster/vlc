@@ -11,8 +11,11 @@ set(PLUGINS
 set(SUBMODULES
         omxil)
 
-if (HAVE_AVCODEC)
+if (HAVE_LIBAVCODEC_AVCODEC_H)
     list(APPEND SUBMODULES avcodec)
+endif ()
+if (HAVE_NEAACDEC_H)
+    list(APPEND PLUGINS faad)
 endif ()
 if (IOS OR MACOS)
     list(APPEND PLUGINS videotoolbox)

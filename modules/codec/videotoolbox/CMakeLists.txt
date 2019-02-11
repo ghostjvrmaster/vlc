@@ -13,7 +13,10 @@ if (IOS OR MACOS)
     file(GLOB SRC_FILES
             ../videotoolbox.m
             ../vt_utils.c
-            ../../packetizer/h*.c)
+            ../../packetizer/hevc_nal.c
+            ../../packetizer/hxxx_*.c
+            ../../packetizer/h264_*.c
+            ../hxxx_helper.c)
 
     set(MODULE_LIBRARIES
             Foundation

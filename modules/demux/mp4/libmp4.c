@@ -36,6 +36,10 @@
 #include "languages.h"
 #include <math.h>
 #include <assert.h>
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#include <limits.h>
 
 /* Some assumptions:
  * The input method HAS to be seekable

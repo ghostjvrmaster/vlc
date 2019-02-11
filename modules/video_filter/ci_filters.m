@@ -643,7 +643,7 @@ Open(vlc_object_t *obj, char const *psz_filter)
                                             colorSpace: nil
                                                options: nil];
 #else
-        CVEAGLContext eaglctx = var_InheritAddress(filter, "ios-eaglcontext");
+        CVEAGLContext eaglctx = (__bridge CVEAGLContext) var_InheritAddress(filter, "ios-eaglcontext");
         if (!eaglctx)
         {
             msg_Err(filter, "can't find 'ios-eaglcontext' var");

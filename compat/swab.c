@@ -24,6 +24,9 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#if HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
 
 void swab( const void *p_src_, void *p_dst_, ssize_t n )
 {

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(bin)
 
-if (ENABLE_BINARIES AND NOT ANDROID)
+if (ENABLE_BINARIES AND NOT ANDROID AND NOT IOS)
 
     include(../cmake/GenerateStaticModuleList.cmake)
 
@@ -68,7 +68,7 @@ if (ENABLE_BINARIES AND NOT ANDROID)
     target_link_libraries(vlc-simple
             vlclib)
 
-    if (NOT HAVE_DYNAMIC_MODULES)
+    if (NOT HAVE_DYNAMIC_PLUGINS)
         set(static_plugins
                 control_dummy_plugin
                 demux_adaptive_plugin

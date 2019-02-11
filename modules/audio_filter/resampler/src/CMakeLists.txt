@@ -7,6 +7,9 @@ include(${vlc_MODULE_HELPER})
 file(GLOB SRC_FILES
         "../src.c")
 
+set(MODULE_INCLUDE_DIRS
+        ${samplerate_INCLUDE_DIRS})
+
 set(MODULE_LIBRARIES
         samplerate)
 

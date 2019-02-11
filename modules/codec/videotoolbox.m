@@ -1830,9 +1830,12 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
             return VLCDEC_SUCCESS;
     }
 
-    frame_info_t *p_info = CreateReorderInfo(p_dec, p_block);
-    if(unlikely(!p_info))
-        goto skip;
+    frame_info_t *p_info;
+    if(p_sys->session) {
+        p_info = CreateReorderInfo(p_dec, p_block);
+        if (unlikely(!p_info))
+            goto skip;
+    }
 
     if (!p_sys->session /* Late Start */||
         (b_config_changed && p_info->b_flush))
@@ -1864,8 +1867,14 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
 
         if (!p_sys->session) /* Start Failed */
         {
-            free(p_info);
+            if(p_info) {
+                free(p_info);
+            }
             goto skip;
+        } else {
+            p_info = CreateReorderInfo(p_dec, p_block);
+            if (unlikely(!p_info))
+                goto skip;
         }
     }
 
@@ -1937,7 +1946,7 @@ skip:
 static int UpdateVideoFormat(decoder_t *p_dec, CVPixelBufferRef imageBuffer)
 {
     CFDictionaryRef attachments = CVBufferGetAttachments(imageBuffer, kCVAttachmentMode_ShouldPropagate);
-    NSDictionary *attachmentDict = (NSDictionary *)attachments;
+    NSDictionary *attachmentDict = (__bridge NSDictionary *)attachments;
 
 
     if (attachmentDict != nil && attachmentDict.count > 0

@@ -4,7 +4,12 @@ project(gui_qt_plugin)
 
 include(${vlc_MODULE_HELPER})
 
-find_package(Qt5 COMPONENTS Core Gui Widgets Svg CONFIG REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Widgets Svg CONFIG)
+
+if (NOT Qt5_DIR)
+    add_custom_target(${PROJECT_NAME})
+    return()
+endif ()
 
 if (WINDOWS)
     set(MODULE_INCLUDE_DIRS

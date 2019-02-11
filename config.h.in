@@ -695,7 +695,7 @@
 #define ICONV_CONST @ICONV_CONST@
 
 /* Dynamic object extension */
-#cmakedefine LIBEXT @LIBEXT@
+#cmakedefine LIBEXT "@LIBEXT@"
 
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #cmakedefine LT_OBJDIR @LT_OBJDIR@

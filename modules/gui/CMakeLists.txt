@@ -4,7 +4,7 @@ project(gui)
 
 include(${vlc_MODULE_HELPER})
 
-if (NOT ANDROID)
+if (NOT ANDROID AND NOT IOS)
     list(APPEND PLUGINS qt)
 endif ()
 

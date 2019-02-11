@@ -78,19 +78,25 @@ if (LINUX)
                 dl)
     endif ()
 elseif (WINDOWS)
-    list(REMOVE_ITEM MISC_SRC_FILES ${UPDATE_FILES})
-
     set(PLATFORM_SRC_FILES ${WIN32_SRC_FILES})
 
     set(PLATFORM_LINK_LIBRARIES
             mingw32
             ws2_32
             pthread)
-elseif (MACOS)
-    set(PLATFORM_SRC_FILES ${DARWIN_SRC_FILES})
-elseif (ANDROID)
-    list(REMOVE_ITEM MISC_SRC_FILES ${UPDATE_FILES})
+elseif (MACOS OR IOS)
+    set(PLATFORM_SRC_FILES
+            ${DARWIN_SRC_FILES}
+            ${POSIX_SRC_FILES})
 
+    file(GLOB UNUSED_FILES
+            posix/dirs.c
+            posix/error.c
+            posix/getaddrinfo.c
+            posix/netconf.c
+            posix/specific.c
+            posix/thread.c)
+elseif (ANDROID)
     set(PLATFORM_SRC_FILES
             ${ANDROID_SRC_FILES}
             ${LINUX_SRC_FILES}
@@ -101,7 +107,13 @@ elseif (ANDROID)
             posix/specific.c
             posix/thread.c
             linux/getaddrinfo.c)
+endif ()
 
+if (NOT HAVE_GCRYPT_H)
+    list(REMOVE_ITEM MISC_SRC_FILES ${UPDATE_FILES})
+endif ()
+
+if (DEFINED UNUSED_FILES)
     list(REMOVE_ITEM PLATFORM_SRC_FILES ${UNUSED_FILES})
 endif ()
 
@@ -129,6 +141,12 @@ add_library(vlccore ${LIBRARY_MODE}
 target_link_libraries(vlccore
         ${PLATFORM_LINK_LIBRARIES}
         compat)
+
+if (MACOS)
+    target_link_libraries(vlccore
+            "-framework CoreFoundation"
+            "-framework CFNetwork")
+endif ()
 
 if (HAVE_IDN)
     target_link_libraries(vlccore

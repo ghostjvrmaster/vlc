@@ -24,6 +24,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 int setenv (const char *name, const char *value, int override)
 {
