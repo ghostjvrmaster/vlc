@@ -138,6 +138,12 @@ macro(ConfigureCheckLibraries)
     include_directories(external/libsamplerate/include)
     list(APPEND CMAKE_LIBRARY_PATH
             external/libsamplerate/lib/ios)
+
+    set(HAVE_LIBAVCODEC_AVCODEC_H ON)
+    set(HAVE_LIBAVUTIL_AVUTIL_H ON)
+    include_directories(external/libav/include)
+    list(APPEND CMAKE_LIBRARY_PATH
+            external/libav/lib/ios)
 endmacro()
 
 macro(ConfigureCheckBuiltin)
