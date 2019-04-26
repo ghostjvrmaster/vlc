@@ -277,7 +277,7 @@ es_out_id_t * FakeESOut::esOutAdd_Callback(es_out_t *fakees, const es_format_t *
 {
     FakeESOut *me = (FakeESOut *) fakees->p_sys;
 
-    if( p_fmt->i_cat != VIDEO_ES && p_fmt->i_cat != AUDIO_ES && p_fmt->i_cat != SPU_ES )
+    if( p_fmt->i_cat != VIDEO_ES && p_fmt->i_cat != AUDIO_ES && p_fmt->i_cat != SPU_ES && p_fmt->i_cat != DATA_ES )
         return NULL;
 
     /* Feed the slave demux/stream_Demux with FakeESOutID struct,

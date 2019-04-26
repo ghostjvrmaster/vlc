@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(demux)
+project(video_output_android)
 
 include(${vlc_MODULE_HELPER})
 
-set(PLUGINS
-        adaptive
-        mp4)
+list(APPEND PLUGINS
+        display
+        window)
 
 ConfigureModuleGroup()

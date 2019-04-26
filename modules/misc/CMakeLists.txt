@@ -4,4 +4,8 @@ project(misc)
 
 include(${vlc_MODULE_HELPER})
 
+if (HAVE_LIBXML)
+    list(APPEND PLUGINS xml)
+endif ()
+
 ConfigureModuleGroup()

@@ -79,6 +79,8 @@ StreamFormat MPD::mimeToFormat(const std::string &mime)
             return StreamFormat(StreamFormat::WEBVTT);
         else if (tail == "ttml+xml")
             return StreamFormat(StreamFormat::TTML);
+        else if (tail == "jaunt+octet-stream")
+            return StreamFormat(StreamFormat::DRACO);
     }
     return StreamFormat();
 }

@@ -26,7 +26,10 @@ file(GLOB NATIVE_CLIENT_SRC_FILES
 
 if (WINDOWS)
     file(GLOB WINDOWS_REMOVE_ITEMS
+            asprintf.c
             strcasecmp.c
+            strtof.c
+            vasprintf.c
             swab.c)
 
     list(REMOVE_ITEM SRC_FILES

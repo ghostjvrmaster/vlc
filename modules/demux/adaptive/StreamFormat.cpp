@@ -45,6 +45,8 @@ std::string StreamFormat::str() const
             return "Timed Text";
         case PACKEDAAC:
             return "Packed AAC";
+        case DRACO:
+            return "Draco Meshes";
         case UNSUPPORTED:
             return "Unsupported";
         default:

@@ -18,4 +18,9 @@ if (HAVE_XCB)
             xcb_xv)
 endif ()
 
+if (ANDROID)
+    list(APPEND SUBMODULES
+            android)
+endif ()
+
 ConfigureModuleGroup()

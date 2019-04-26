@@ -60,7 +60,7 @@ vlc_module_begin()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
     set_description("Android video output")
-    set_capability("vout display", 260)
+    set_capability("vout display", 0)
     add_shortcut("android-display")
     add_string(CFG_PREFIX "chroma", NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true)
     set_callbacks(Open, Close)
@@ -652,15 +652,19 @@ static int OpenCommon(vout_display_t *vd)
      * openGL vout, with a higher priority, should be used when the projection
      * need to be handled). */
     if (vd->fmt.i_chroma == VLC_CODEC_ANDROID_OPAQUE
-     && vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR)
+     && vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR) {
+        msg_Dbg(vd, "invalid projection mode: %d", vd->fmt.projection_mode);
         return VLC_EGENERIC;
+    }
     vd->fmt.projection_mode = PROJECTION_MODE_RECTANGULAR;
 
     vout_window_t *embed =
         vout_display_NewWindow(vd, VOUT_WINDOW_TYPE_ANDROID_NATIVE);
 
-    if (embed == NULL)
+    if (embed == NULL) {
+        msg_Dbg(vd, "embed == NULL");
         return VLC_EGENERIC;
+    }
     assert(embed->handle.anativewindow);
     AWindowHandler *p_awh = embed->handle.anativewindow;
 
@@ -669,6 +673,7 @@ static int OpenCommon(vout_display_t *vd)
         /* It's better to use gles2 if we are not able to change the video
          * layout */
         vout_display_DeleteWindow(vd, embed);
+        msg_Dbg(vd, "couldn't set video layout");
         return VLC_EGENERIC;
     }
 
@@ -721,11 +726,15 @@ static int OpenCommon(vout_display_t *vd)
     }
 
     sys->p_window = AndroidWindow_New(vd, &vd->fmt, AWindow_Video, true);
-    if (!sys->p_window)
+    if (!sys->p_window) {
+        msg_Dbg(vd, "AndroidWindow_New failed");
         goto error;
+    }
 
-    if (AndroidWindow_Setup(sys, sys->p_window, 0) != 0)
+    if (AndroidWindow_Setup(sys, sys->p_window, 0) != 0) {
+        msg_Dbg(vd, "AndroidWindow_Setup failed");
         goto error;
+    }
 
     /* use software rotation if we don't use private anw */
     if (!sys->p_window->b_opaque && !sys->p_window->b_use_priv)
@@ -747,12 +756,12 @@ static int OpenCommon(vout_display_t *vd)
         /* Export the subpicture capability of this vout. */
         vd->info.subpicture_chromas = subpicture_chromas;
     }
-    else if (!vd->obj.force && sys->p_window->b_opaque)
+    /*else if (!vd->obj.force && sys->p_window->b_opaque)
     {
         msg_Warn(vd, "cannot blend subtitles with an opaque surface, "
                      "trying next vout");
         goto error;
-    }
+    }*/
 
     /* Setup vout_display */
     vd->pool    = Pool;
@@ -770,10 +779,17 @@ error:
 
 static int Open(vlc_object_t *p_this)
 {
+    msg_Dbg(p_this, "android_display::Open");
+
     vout_display_t *vd = (vout_display_t*)p_this;
 
-    if (vd->fmt.i_chroma == VLC_CODEC_ANDROID_OPAQUE)
+    if (vd->fmt.i_chroma == VLC_CODEC_ANDROID_OPAQUE) {
+        char fourcc[5];
+        fourcc[4] = 0;
+        vlc_fourcc_to_char(vd->fmt.i_chroma, fourcc);
+        msg_Dbg(p_this, "Invalid chroma: %s", fourcc);
         return VLC_EGENERIC;
+    }
 
     /* At this point, gles2 vout failed (old Android device) */
     vd->fmt.projection_mode = PROJECTION_MODE_RECTANGULAR;
@@ -782,12 +798,18 @@ static int Open(vlc_object_t *p_this)
 
 static int OpenOpaque(vlc_object_t *p_this)
 {
+    msg_Dbg(p_this, "android_display::OpenOpaque");
+
     vout_display_t *vd = (vout_display_t*)p_this;
 
     if (vd->fmt.i_chroma != VLC_CODEC_ANDROID_OPAQUE
      || vd->fmt.projection_mode != PROJECTION_MODE_RECTANGULAR
      || vd->fmt.orientation != ORIENT_NORMAL)
     {
+        char fourcc[5];
+        fourcc[4] = 0;
+        vlc_fourcc_to_char(vd->fmt.i_chroma, fourcc);
+        msg_Dbg(p_this, "Invalid chroma: %s; or orientation: %d", fourcc, vd->fmt.orientation);
         /* Let the gles2 vout handle orientation and projection */
         return VLC_EGENERIC;
     }

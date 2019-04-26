@@ -48,6 +48,10 @@ AbstractDemuxer * DASHStream::createDemux(const StreamFormat &format)
             ret = new Demuxer(p_realdemux, "ts", fakeesout->getEsOut(), demuxersource);
             break;
 
+        case StreamFormat::DRACO:
+            ret = new Demuxer(p_realdemux, "draco", fakeesout->getEsOut(), demuxersource);
+            break;
+
         case StreamFormat::WEBVTT:
             ret = new SlaveDemuxer(p_realdemux, "webvtt", fakeesout->getEsOut(), demuxersource);
             break;
