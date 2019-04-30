@@ -376,6 +376,8 @@ macro(ConfigurePlatformOverrides)
         set(HAVE_STRUCT_TIMESPEC ON)
         set(ENABLE_NLS OFF)
         add_definitions(-D__USE_MINGW_ANSI_STDIO)
+    elseif(MACOS)
+        include_directories(${CMAKE_OSX_SYSROOT}/usr/include/libxml2)
     endif ()
 
     if (NOT HAVE_LIBINTL_H)
