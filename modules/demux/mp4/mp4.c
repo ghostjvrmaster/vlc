@@ -54,6 +54,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_description( N_("MP4 stream demuxer") )
     set_shortname( N_("MP4") )
+    set_shortname( N_("mp4") )
     set_capability( "demux", 240 )
     set_callbacks( Open, Close )
 

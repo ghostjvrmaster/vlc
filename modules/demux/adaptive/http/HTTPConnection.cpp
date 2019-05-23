@@ -29,6 +29,7 @@
 #include <cstdio>
 #include <sstream>
 #include <vlc_stream.h>
+#include <algorithm>
 
 using namespace adaptive::http;
 
@@ -431,6 +432,90 @@ std::string HTTPConnection::extraRequestHeaders() const
     return ss.str();
 }
 
+FileConnection::FileConnection(vlc_object_t *p_object_)
+    : AbstractConnection( p_object_ )
+{
+}
+
+FileConnection::~FileConnection()
+{
+    delete mFile;
+}
+
+bool FileConnection::canReuse(const ConnectionParams &params_) const
+{
+    return false;
+}
+
+int FileConnection::request(const std::string &path, const BytesRange &range)
+{
+    std::string path_ = path;
+
+    // Windows:
+    // file:///C:/foo ==> path = /C:/foo
+    if(path_.find(':') == 2) {
+        path_ = path_.substr(1);
+        std::replace(path_.begin(), path_.end(), '/', '\\');
+    }
+
+    params.setPath(path_);
+    bytesRange = range;
+
+    mFile = new std::ifstream(path_, std::ios::binary | std::ios::ate);
+    if(!mFile->is_open()) {
+        delete mFile;
+        mFile = nullptr;
+        return VLC_EGENERIC;
+    }
+
+    contentLength = mFile->tellg();
+
+    size_t start = 0;
+    if(bytesRange.isValid()) {
+        if(bytesRange.getEndByte() > contentLength) {
+            bytesRange = BytesRange(bytesRange.getStartByte(), contentLength);
+        }
+        start = bytesRange.getStartByte();
+    }
+    mFile->seekg(start, std::ios::beg);
+
+    return VLC_SUCCESS;
+}
+
+ssize_t FileConnection::read(void *p_buffer, size_t len)
+{
+    if(mFile == nullptr || !mFile->is_open()) {
+        return VLC_EGENERIC;
+    }
+
+    const size_t toRead = (contentLength) ? contentLength - bytesRead : len;
+    if (toRead == 0) {
+        return VLC_SUCCESS;
+    }
+
+    if(len > toRead) {
+        len = toRead;
+    }
+
+    ssize_t ret = mFile->readsome(static_cast<char*>(p_buffer), len);
+
+    if(ret >= 0) {
+        bytesRead += ret;
+    }
+
+    return ret;
+}
+
+void FileConnection::setUsed(bool used)
+{
+    available = !used;
+    if(available && contentLength == bytesRead) {
+        bytesRead = 0;
+        contentLength = 0;
+        bytesRange = BytesRange();
+    }
+}
+
 StreamUrlConnection::StreamUrlConnection(vlc_object_t *p_object)
     : AbstractConnection(p_object)
 {
@@ -545,6 +630,10 @@ ConnectionFactory::~ConnectionFactory()
 AbstractConnection * ConnectionFactory::createConnection(vlc_object_t *p_object,
                                                          const ConnectionParams &params)
 {
+    if(params.getScheme() == "file") {
+        return new (std::nothrow) FileConnection(p_object);
+    }
+
     if((params.getScheme() != "http" && params.getScheme() != "https") || params.getHostname().empty())
         return NULL;
 

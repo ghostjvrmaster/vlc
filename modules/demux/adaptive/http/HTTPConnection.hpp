@@ -29,6 +29,7 @@
 #include "BytesRange.hpp"
 #include <vlc_common.h>
 #include <string>
+#include <fstream>
 
 namespace adaptive
 {
@@ -104,6 +105,22 @@ namespace adaptive
 
             private:
                 Socket *socket;
+       };
+
+       class FileConnection : public AbstractConnection
+       {
+            public:
+                FileConnection(vlc_object_t *);
+                ~FileConnection() override;
+
+                bool    canReuse     (const ConnectionParams &) const override;
+                int     request     (const std::string& path, const BytesRange & = BytesRange()) override;
+                ssize_t read        (void *p_buffer, size_t len) override;
+
+                void    setUsed( bool ) override;
+
+            private:
+                std::ifstream *mFile = nullptr;
        };
 
        class StreamUrlConnection : public AbstractConnection

@@ -1165,6 +1165,15 @@ static int SessionsSetup( demux_t *p_demux )
                     tk->fmt.i_codec = VLC_CODEC_ITU_T140;
                 }
             }
+            else if( !strcmp( sub->mediumName(), "data" ) )
+            {
+                es_format_Init( &tk->fmt, DATA_ES, VLC_CODEC_UNKNOWN );
+
+                if( !strcmp( sub->codecName(), "DRCO" ) )
+                {
+                    tk->fmt.i_codec = VLC_FOURCC('D', 'R', 'C', 'O');
+                }
+            }
 
             /* Try and parse a=lang: attribute */
             p_lang = strstr( sub->savedSDPLines(), "a=lang:" );

@@ -185,7 +185,7 @@ void NearOptimalAdaptationLogic::updateDownloadRate(const ID &id, size_t dlsize,
     if(it != streams.end())
     {
         NearOptimalContext &ctx = (*it).second;
-        ctx.last_download_rate = ctx.average.push(CLOCK_FREQ * dlsize * 8 / time);
+        ctx.last_download_rate = ctx.average.push(CLOCK_FREQ * dlsize * 8 / (time ? time : 1));
     }
     currentBps = getMaxCurrentBw();
     vlc_mutex_unlock(&lock);

@@ -4,8 +4,10 @@ project(access)
 
 include(${vlc_MODULE_HELPER})
 
-set(PLUGINS
-        fs;
-        http;)
+list(APPEND PLUGINS
+        fs
+        http
+        rtsp
+        live555)
 
 ConfigureModuleGroup()

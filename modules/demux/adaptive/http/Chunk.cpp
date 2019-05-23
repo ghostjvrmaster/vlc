@@ -140,10 +140,10 @@ bool HTTPChunkSource::init(const std::string &url)
 {
     params = ConnectionParams(url);
 
-    if(params.getScheme() != "http" && params.getScheme() != "https")
-        return false;
+//    if(params.getScheme() != "http" && params.getScheme() != "https")
+//        return false;
 
-    if(params.getPath().empty() || params.getHostname().empty())
+    if(params.getPath().empty())
         return false;
 
     return true;
