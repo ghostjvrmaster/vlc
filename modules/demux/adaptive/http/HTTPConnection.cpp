@@ -497,7 +497,8 @@ ssize_t FileConnection::read(void *p_buffer, size_t len)
         len = toRead;
     }
 
-    ssize_t ret = mFile->readsome(static_cast<char*>(p_buffer), len);
+    mFile->read(static_cast<char*>(p_buffer), len);
+    ssize_t ret = mFile->gcount();
 
     if(ret >= 0) {
         bytesRead += ret;
