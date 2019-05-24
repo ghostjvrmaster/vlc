@@ -5,7 +5,16 @@ project(misc)
 include(${vlc_MODULE_HELPER})
 
 if (HAVE_LIBXML)
-    list(APPEND PLUGINS xml)
+    list(APPEND PLUGINS
+         xml)
+endif ()
+
+if (APPLE)
+    list(APPEND PLUGINS
+         securetransport)
+else ()
+    list(APPEND PLUGINS
+         gnutls)
 endif ()
 
 ConfigureModuleGroup()
