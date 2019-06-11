@@ -2344,14 +2344,8 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         enum es_format_category_e i_cat;
         if( es == NULL )
             i_cat = UNKNOWN_ES;
-        else if( es == es_cat + AUDIO_ES )
-            i_cat = AUDIO_ES;
-        else if( es == es_cat + VIDEO_ES )
-            i_cat = VIDEO_ES;
-        else if( es == es_cat + SPU_ES )
-            i_cat = SPU_ES;
         else
-            i_cat = DATA_ES;
+            i_cat = es->fmt.i_cat;
 
         for( int i = 0; i < p_sys->i_es; i++ )
         {

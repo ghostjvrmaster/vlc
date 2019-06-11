@@ -378,6 +378,7 @@ macro(ConfigurePlatformOverrides)
         add_definitions(-D__USE_MINGW_ANSI_STDIO)
     elseif(MACOS)
         include_directories(${CMAKE_OSX_SYSROOT}/usr/include/libxml2)
+        add_compile_options(-fobjc-arc)
     endif ()
 
     if (NOT HAVE_LIBINTL_H)
