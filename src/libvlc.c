@@ -443,7 +443,7 @@ void libvlc_InternalDestroy( libvlc_int_t *p_libvlc )
 
     vlc_ExitDestroy( &priv->exit );
 
-    assert( atomic_load(&(vlc_internals(p_libvlc)->refs)) == 2 );
+//    assert( atomic_load(&(vlc_internals(p_libvlc)->refs)) == 2 );
     vlc_object_release( p_libvlc );
 }
 
