@@ -137,9 +137,14 @@ endmacro()
 
 macro(ConfigureCheckLibraries)
     set(HAVE_SAMPLERATE ON)
-    include_directories(external/libsamplerate/include)
+    include_directories(
+            external/libsamplerate/include
+            external/libxml2/include
+            external/libgnutls/include)
     list(APPEND CMAKE_LIBRARY_PATH
-            external/libsamplerate/lib/android/arm64-v8a)
+            external/libsamplerate/lib/android/arm64-v8a
+            external/libxml2/lib/android/arm64-v8a
+            external/libgnutls/lib/android/arm64-v8a)
 endmacro()
 
 macro(ConfigureCheckBuiltin)
@@ -284,6 +289,7 @@ endmacro()
 
 macro(ConfigurePlatformOverrides)
     set(HAVE_DYNAMIC_PLUGINS OFF)
+    set(HAVE_LIBXML ON)
     set(ENABLE_NLS OFF)
     add_compile_definitions(PRIVATE ANDROID_API=${ANDROID_PLATFORM_LEVEL} NDEBUG)
 endmacro()
