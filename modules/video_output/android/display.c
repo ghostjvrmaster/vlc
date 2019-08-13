@@ -88,6 +88,9 @@ static void             Prepare(vout_display_t *, picture_t *, subpicture_t *);
 static void             Display(vout_display_t *, picture_t *, subpicture_t *);
 static int              Control(vout_display_t *, int, va_list);
 
+typedef void (*config_callback)(void *, uint32_t width, uint32_t height, vlc_fourcc_t);
+typedef void (*display_callback)(void *, picture_t *);
+
 typedef struct android_window android_window;
 struct android_window
 {
@@ -139,6 +142,10 @@ struct vout_display_sys_t
     bool b_has_subpictures;
 
     uint8_t hash[16];
+
+    void *p_cb_opaque;
+    display_callback pf_display;
+    config_callback pf_config;
 };
 
 #define PRIV_WINDOW_FORMAT_YV12 0x32315659
@@ -185,6 +192,11 @@ static int UpdateVideoSize(vout_display_sys_t *sys, video_format_t *p_fmt,
                                   rot_fmt.i_visible_width,
                                   rot_fmt.i_visible_height,
                                   i_sar_num, i_sar_den);
+
+    if(sys->pf_config != NULL) {
+        sys->pf_config(sys->p_cb_opaque, rot_fmt.i_visible_width, rot_fmt.i_visible_height, p_fmt->i_chroma);
+    }
+
     return 0;
 }
 
@@ -763,6 +775,10 @@ static int OpenCommon(vout_display_t *vd)
         goto error;
     }*/
 
+    sys->pf_config = (config_callback *)var_InheritAddress(vd, "volcap-video-config");
+    sys->pf_display = (display_callback *)var_InheritAddress(vd, "volcap-video-out");
+    sys->p_cb_opaque = var_InheritAddress(vd, "volcap-player");
+
     /* Setup vout_display */
     vd->pool    = Pool;
     vd->prepare = Prepare;
@@ -1186,6 +1202,10 @@ static void Display(vout_display_t *vd, picture_t *picture,
         AndroidOpaquePicture_Release(picture->p_sys, true);
     else
         AndroidWindow_UnlockPicture(sys, sys->p_window, picture, true);
+
+    if (sys->pf_display != NULL) {
+        sys->pf_display(sys->p_cb_opaque, picture);
+    }
 
     picture_Release(picture);
 
