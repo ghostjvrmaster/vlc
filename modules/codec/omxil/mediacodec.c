@@ -106,6 +106,7 @@ struct decoder_sys_t
     bool            b_drained;
     bool            b_adaptive;
     int             i_decode_flags;
+    vlc_array_t     timestamps;
 
     union
     {
@@ -130,6 +131,13 @@ struct decoder_sys_t
             int pi_extraction[AOUT_CHAN_MAX];
         } audio;
     };
+};
+
+struct timestamp_t
+{
+    mtime_t i_pts;
+    mtime_t i_dts;
+    mtime_t i_timestamp;
 };
 
 /*****************************************************************************
@@ -945,6 +953,29 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
             }
         }
         assert(!(*pp_out_pic));
+
+        mtime_t i_timestamp = 0;
+        size_t ts_count = vlc_array_count(&p_sys->timestamps);
+        for (size_t i = 0; i < ts_count; i++)
+        {
+            struct timestamp_t *ts = vlc_array_item_at_index(&p_sys->timestamps, i);
+            if (ts->i_pts > p_pic->date)
+            {
+                break;
+            }
+
+            vlc_array_remove(&p_sys->timestamps, i);
+            ts_count--;
+            i--;
+            if (ts->i_pts == p_pic->date)
+            {
+                i_timestamp = ts->i_timestamp;
+                break;
+            }
+        }
+
+        p_pic->timestamp = i_timestamp;
+
         *pp_out_pic = p_pic;
         return 1;
     } else {
@@ -1318,6 +1349,16 @@ static int QueueBlockLocked(decoder_t *p_dec, block_t *p_in_block,
                 p_buf = p_block->p_buffer;
                 i_size = p_block->i_buffer;
             }
+
+            struct timestamp_t *ts = malloc(sizeof(struct timestamp_t));
+            ts->i_pts = p_block->i_pts;
+            if(ts->i_pts == VLC_TS_INVALID)
+            {
+                ts->i_pts = p_block->i_dts;
+            }
+            ts->i_dts = p_block->i_dts;
+            ts->i_timestamp = p_block->i_timestamp;
+            vlc_array_append(&p_sys->timestamps, ts);
 
             if (p_sys->api.queue_in(&p_sys->api, i_index, p_buf, i_size,
                                     i_ts, b_config) == 0)
