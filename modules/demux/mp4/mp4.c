@@ -465,6 +465,7 @@ static block_t * MP4_EIA608_Convert( block_t * p_block )
     p_newblock->i_pts = p_block->i_dts;
     p_newblock->i_buffer = i_copied;
     p_newblock->i_flags = BLOCK_FLAG_TYPE_P;
+    p_newblock->i_timestamp = p_block->i_timestamp;
     block_Release( p_block );
 
     return p_newblock;
@@ -4308,6 +4309,7 @@ static int FragDemuxTrack( demux_t *p_demux, mp4_track_t *p_track,
             else
                 p_block->i_pts = VLC_TS_0 + MP4_rescale( i_pts, p_track->i_timescale, CLOCK_FREQ );
             p_block->i_length = MP4_rescale( dur, p_track->i_timescale, CLOCK_FREQ );
+            p_block->i_timestamp = i_dts;
             MP4_Block_Send( p_demux, p_track, p_block );
         }
         else block_Release( p_block );

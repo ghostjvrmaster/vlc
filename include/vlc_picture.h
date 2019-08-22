@@ -99,6 +99,8 @@ struct picture_t
 
     /** Next picture in a FIFO a pictures */
     struct picture_t *p_next;
+
+    mtime_t         timestamp;
 };
 
 /**

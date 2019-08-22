@@ -91,6 +91,15 @@ struct decoder_sys_t
     int level;
 
     vlc_sem_t sem_mt;
+
+    vlc_array_t timestamps;
+};
+
+struct timestamp_t
+{
+    mtime_t i_pts;
+    mtime_t i_dts;
+    mtime_t i_timestamp;
 };
 
 static inline void wait_mt(decoder_sys_t *sys)
@@ -465,6 +474,7 @@ int InitVideoDec( vlc_object_t *obj )
     p_sys->p_codec = p_codec;
     p_sys->p_va = NULL;
     vlc_sem_init( &p_sys->sem_mt, 0 );
+    vlc_array_init(&p_sys->timestamps);
 
     /* ***** Fill p_context with init values ***** */
     p_context->codec_tag = ffmpeg_CodecTag( p_dec->fmt_in.i_original_fourcc ?
@@ -1003,6 +1013,19 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
             }
         }
 
+        if (p_block)
+        {
+            struct timestamp_t *ts = malloc(sizeof(struct timestamp_t));
+            ts->i_pts = p_block->i_pts;
+            if(ts->i_pts == VLC_TS_INVALID)
+            {
+                ts->i_pts = p_block->i_dts;
+            }
+            ts->i_dts = p_block->i_dts;
+            ts->i_timestamp = p_block->i_timestamp;
+            vlc_array_append(&p_sys->timestamps, ts);
+        }
+
         /* Make sure we don't reuse the same timestamps twice */
         if( p_block )
         {
@@ -1195,6 +1218,27 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
             }
         }
 
+        mtime_t i_timestamp = 0;
+        size_t ts_count = vlc_array_count(&p_sys->timestamps);
+        for (size_t i = 0; i < ts_count; i++)
+        {
+            struct timestamp_t *ts = vlc_array_item_at_index(&p_sys->timestamps, i);
+            if (ts->i_pts > i_pts)
+            {
+                break;
+            }
+
+            vlc_array_remove(&p_sys->timestamps, i);
+            ts_count--;
+            i--;
+            if (ts->i_pts == i_pts)
+            {
+                i_timestamp = ts->i_timestamp;
+                break;
+            }
+        }
+
+        p_pic->timestamp = i_timestamp;
         p_pic->date = i_pts;
         /* Hack to force display of still pictures */
         p_pic->b_force = p_sys->b_first_frame;

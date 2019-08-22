@@ -89,7 +89,6 @@ static const struct classname classes[] = {
     { "android/media/MediaCodecList", OFF(media_codec_list_class) },
     { "android/media/MediaCodec", OFF(media_codec_class) },
     { "android/media/MediaFormat", OFF(media_format_class) },
-    { "android/media/MediaFormat", OFF(media_format_class) },
     { "android/media/MediaCodec$BufferInfo", OFF(buffer_info_class) },
     { "java/nio/ByteBuffer", OFF(byte_buffer_class) },
     { NULL, 0 },

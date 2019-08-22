@@ -127,6 +127,9 @@ struct block_t
 
     /* Rudimentary support for overloading block (de)allocation. */
     block_free_t pf_release;
+
+    /* original timestamp for block */
+    mtime_t     i_timestamp;
 };
 
 VLC_API void block_Init( block_t *, void *, size_t );
