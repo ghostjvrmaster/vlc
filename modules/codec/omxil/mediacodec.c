@@ -759,6 +759,11 @@ static int OpenDecoder(vlc_object_t *p_this, pf_MediaCodecApi_init pf_init)
     p_dec->pf_decode = DecodeBlock;
     p_dec->pf_flush  = DecodeFlush;
 
+    if (p_sys->pf_process_output == Video_ProcessOutput)
+    {
+        vlc_array_init(&p_sys->timestamps);
+    }
+
     return VLC_SUCCESS;
 
 bailout:
@@ -808,6 +813,16 @@ static void CleanDecoder(decoder_t *p_dec)
 
         if (p_sys->video.timestamp_fifo)
             timestamp_FifoRelease(p_sys->video.timestamp_fifo);
+    }
+    if (p_sys->pf_process_output == Video_ProcessOutput)
+    {
+        size_t count = vlc_array_count( &p_sys->timestamps );
+        for(int i = 0; i < count; ++i)
+        {
+            struct timestamp_t *ts = vlc_array_item_at_index( &p_sys->timestamps, i );
+            free(ts);
+        }
+        vlc_array_clear( &p_sys->timestamps );
     }
     free(p_sys);
 }
@@ -967,9 +982,12 @@ static int Video_ProcessOutput(decoder_t *p_dec, mc_api_out *p_out,
             vlc_array_remove(&p_sys->timestamps, i);
             ts_count--;
             i--;
-            if (ts->i_pts == p_pic->date)
+            mtime_t pts = ts->i_pts;
+            mtime_t timestamp = ts->i_timestamp;
+            free(ts);
+            if (pts == p_pic->date)
             {
-                i_timestamp = ts->i_timestamp;
+                i_timestamp = timestamp;
                 break;
             }
         }
@@ -1350,15 +1368,18 @@ static int QueueBlockLocked(decoder_t *p_dec, block_t *p_in_block,
                 i_size = p_block->i_buffer;
             }
 
-            struct timestamp_t *ts = malloc(sizeof(struct timestamp_t));
-            ts->i_pts = p_block->i_pts;
-            if(ts->i_pts == VLC_TS_INVALID)
+            if (p_sys->pf_process_output == Video_ProcessOutput)
             {
-                ts->i_pts = p_block->i_dts;
+                struct timestamp_t *ts = malloc(sizeof(struct timestamp_t));
+                ts->i_pts = p_block->i_pts;
+                if(ts->i_pts == VLC_TS_INVALID)
+                {
+                    ts->i_pts = p_block->i_dts;
+                }
+                ts->i_dts = p_block->i_dts;
+                ts->i_timestamp = p_block->i_timestamp;
+                vlc_array_append(&p_sys->timestamps, ts);
             }
-            ts->i_dts = p_block->i_dts;
-            ts->i_timestamp = p_block->i_timestamp;
-            vlc_array_append(&p_sys->timestamps, ts);
 
             if (p_sys->api.queue_in(&p_sys->api, i_index, p_buf, i_size,
                                     i_ts, b_config) == 0)

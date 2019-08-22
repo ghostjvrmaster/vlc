@@ -1231,9 +1231,12 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block, bool *error
             vlc_array_remove(&p_sys->timestamps, i);
             ts_count--;
             i--;
-            if (ts->i_pts == i_pts)
+            mtime_t pts = ts->i_pts;
+            mtime_t timestamp = ts->i_timestamp;
+            free(ts);
+            if (pts == p_pic->date)
             {
-                i_timestamp = ts->i_timestamp;
+                i_timestamp = timestamp;
                 break;
             }
         }
@@ -1306,6 +1309,15 @@ void EndVideoDec( vlc_object_t *obj )
         vlc_va_Delete( p_sys->p_va, &hwaccel_context );
 
     vlc_sem_destroy( &p_sys->sem_mt );
+
+    size_t count = vlc_array_count( &p_sys->timestamps );
+    for(int i = 0; i < count; ++i)
+    {
+        struct timestamp_t *ts = vlc_array_item_at_index( &p_sys->timestamps, i );
+        free(ts);
+    }
+    vlc_array_clear( &p_sys->timestamps );
+
     free( p_sys );
 }
 

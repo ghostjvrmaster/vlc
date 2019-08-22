@@ -1320,7 +1320,6 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->vtsession_status = VTSESSION_STATUS_OK;
     p_sys->b_enable_temporal_processing =
         var_InheritBool(p_dec, "videotoolbox-temporal-deinterlacing");
-    vlc_array_init(&p_sys->timestamps);
 
     char *cvpx_chroma = var_InheritString(p_dec, "videotoolbox-cvpx-chroma");
     if (cvpx_chroma != NULL)
@@ -1353,6 +1352,8 @@ static int OpenDecoder(vlc_object_t *p_this)
 
     p_dec->pf_decode = DecodeBlock;
     p_dec->pf_flush  = RequestFlush;
+
+    vlc_array_init(&p_sys->timestamps);
 
     switch(codec)
     {
@@ -1441,6 +1442,15 @@ static void CloseDecoder(vlc_object_t *p_this)
         p_sys->pic_holder->closed = true;
         vlc_mutex_unlock(&p_sys->pic_holder->lock);
     }
+
+    size_t count = vlc_array_count( &p_sys->timestamps );
+    for(int i = 0; i < count; ++i)
+    {
+        struct timestamp_t *ts = vlc_array_item_at_index( &p_sys->timestamps, i );
+        free(ts);
+    }
+    vlc_array_clear( &p_sys->timestamps );
+
     free(p_sys);
 }
 
@@ -2187,9 +2197,12 @@ static void DecoderCallback(void *decompressionOutputRefCon,
             vlc_array_remove(&p_sys->timestamps, i);
             ts_count--;
             i--;
-            if (ts->i_pts == pts.value)
+            mtime_t pts = ts->i_pts;
+            mtime_t timestamp = ts->i_timestamp;
+            free(ts);
+            if (pts == p_pic->date)
             {
-                i_timestamp = ts->i_timestamp;
+                i_timestamp = timestamp;
                 break;
             }
         }
