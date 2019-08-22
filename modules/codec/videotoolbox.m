@@ -186,6 +186,8 @@ struct decoder_sys_t
     date_t                      pts;
 
     struct pic_holder          *pic_holder;
+
+    vlc_array_t                 timestamps;
 };
 
 struct pic_holder
@@ -194,6 +196,13 @@ struct pic_holder
     vlc_mutex_t lock;
     vlc_cond_t  wait;
     uint8_t     nb_out;
+};
+
+struct timestamp_t
+{
+    mtime_t i_pts;
+    mtime_t i_dts;
+    mtime_t i_timestamp;
 };
 
 #pragma mark - start & stop
@@ -1311,6 +1320,7 @@ static int OpenDecoder(vlc_object_t *p_this)
     p_sys->vtsession_status = VTSESSION_STATUS_OK;
     p_sys->b_enable_temporal_processing =
         var_InheritBool(p_dec, "videotoolbox-temporal-deinterlacing");
+    vlc_array_init(&p_sys->timestamps);
 
     char *cvpx_chroma = var_InheritString(p_dec, "videotoolbox-cvpx-chroma");
     if (cvpx_chroma != NULL)
@@ -1892,6 +1902,16 @@ static int DecodeBlock(decoder_t *p_dec, block_t *p_block)
      && (p_block->i_flags & BLOCK_FLAG_INTERLACED_MASK))
         decoderFlags |= kVTDecodeFrame_EnableTemporalProcessing;
 
+    struct timestamp_t *ts = malloc(sizeof(struct timestamp_t));
+    ts->i_pts = p_block->i_pts;
+    if(ts->i_pts == VLC_TS_INVALID)
+    {
+        ts->i_pts = p_block->i_dts;
+    }
+    ts->i_dts = p_block->i_dts;
+    ts->i_timestamp = p_block->i_timestamp;
+    vlc_array_append(&p_sys->timestamps, ts);
+
     OSStatus status =
         VTDecompressionSessionDecodeFrame(p_sys->session, sampleBuffer,
                                           decoderFlags, p_info, &flagOut);
@@ -2153,6 +2173,28 @@ static void DecoderCallback(void *decompressionOutputRefCon,
             p_pic->i_nb_fields = p_info->i_num_ts;
             p_pic->b_top_field_first = p_info->b_top_field_first;
         }
+
+        mtime_t i_timestamp = 0;
+        size_t ts_count = vlc_array_count(&p_sys->timestamps);
+        for (size_t i = 0; i < ts_count; i++)
+        {
+            struct timestamp_t *ts = vlc_array_item_at_index(&p_sys->timestamps, i);
+            if (ts->i_pts > pts.value)
+            {
+                break;
+            }
+
+            vlc_array_remove(&p_sys->timestamps, i);
+            ts_count--;
+            i--;
+            if (ts->i_pts == pts.value)
+            {
+                i_timestamp = ts->i_timestamp;
+                break;
+            }
+        }
+
+        p_pic->timestamp = i_timestamp;
 
         OnDecodedFrame( p_dec, p_info );
         p_info = NULL;
